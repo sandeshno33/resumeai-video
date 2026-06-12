@@ -1,0 +1,28 @@
+{
+  "name": "resumeai-video",
+  "version": "1.0.0",
+  "description": "ResumeAI — 15-second Google Ads video in 16:9, 9:16, and 1:1",
+  "scripts": {
+    "start": "remotion studio",
+    "build:16x9": "remotion render src/Root.tsx ResumeAI-16x9 --output out/resumeai_16x9_1080p.mp4 --codec h264 --crf 18 --image-format jpeg",
+    "build:9x16": "remotion render src/Root.tsx ResumeAI-9x16  --output out/resumeai_9x16_1080p.mp4  --codec h264 --crf 18 --image-format jpeg",
+    "build:1x1": "remotion render src/Root.tsx ResumeAI-1x1   --output out/resumeai_1x1_1080p.mp4   --codec h264 --crf 18 --image-format jpeg",
+    "build:all": "npm run build:16x9 && npm run build:9x16 && npm run build:1x1",
+    "preview": "remotion studio src/Root.tsx"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.470",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "remotion": {
+    "entryPoint": "./src/Root.tsx"
+  }
+}
