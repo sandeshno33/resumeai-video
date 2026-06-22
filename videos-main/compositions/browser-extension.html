@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — Chrome Extension</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    .page-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .page-title { display: flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 300; letter-spacing: -0.64px; color: var(--heading); }
+    .page-desc { font-size: 16px; color: var(--body); max-width: 720px; line-height: 1.5; }
+
+    .ext-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; }
+
+    /* LEFT: Connect card */
+    .connect-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); padding: 28px; box-shadow: var(--shadow-elevated); display: flex; flex-direction: column; gap: 18px; }
+    .connect-status { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 4px 10px; background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); border-radius: 999px; font-size: 12px; font-weight: 500; }
+    .connect-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 4px rgba(21,190,83,0.20); }
+
+    .connect-title { font-size: 26px; font-weight: 300; letter-spacing: -0.26px; color: var(--heading); }
+    .connect-sub { font-size: 14px; color: var(--body); line-height: 1.5; }
+
+    .connect-info { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--tint-30); border: 1px solid var(--border); border-radius: var(--r-relaxed); }
+    .connect-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .connect-row .lbl { color: var(--body); }
+    .connect-row .val { color: var(--label); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+
+    .feature-list { display: flex; flex-direction: column; gap: 12px; }
+    .feature-item { display: flex; gap: 12px; align-items: flex-start; }
+    .feature-icon { width: 32px; height: 32px; border-radius: var(--r-standard); background: var(--primary-tint-8); color: var(--primary); display: grid; place-items: center; flex-shrink: 0; }
+    .feature-meta { display: flex; flex-direction: column; gap: 2px; }
+    .feature-name { font-size: 14px; color: var(--heading); font-weight: 400; }
+    .feature-desc { font-size: 12px; color: var(--body); line-height: 1.4; }
+
+    .connect-actions { display: flex; gap: 8px; }
+    .connect-actions .btn { flex: 1; justify-content: center; }
+
+    /* RIGHT: Browser frame mock */
+    .browser-frame { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); overflow: hidden; box-shadow: var(--shadow-deep); display: flex; flex-direction: column; }
+    .browser-bar { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface-soft); border-bottom: 1px solid var(--border); }
+    .traffic-lights { display: flex; gap: 6px; }
+    .traffic-lights span { width: 12px; height: 12px; border-radius: 50%; }
+    .traffic-lights span:nth-child(1) { background: #ff5f57; }
+    .traffic-lights span:nth-child(2) { background: #febc2e; }
+    .traffic-lights span:nth-child(3) { background: #28c840; }
+    .browser-tabs { display: flex; gap: 4px; flex: 1; }
+    .browser-tab { padding: 6px 12px; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; font-size: 12px; color: var(--label); display: flex; align-items: center; gap: 6px; }
+    .url-bar { flex: 2; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; font-size: 12px; color: var(--label); }
+    .url-bar .lock { color: var(--success-text); }
+    .ext-icons { display: flex; gap: 6px; }
+    .ext-icon { width: 28px; height: 28px; border-radius: var(--r-standard); display: grid; place-items: center; }
+    .ext-icon.active { background: var(--primary); color: #fff; box-shadow: 0 0 0 3px var(--primary-tint-5); }
+
+    /* LinkedIn-like content */
+    .li-page { display: flex; flex-direction: column; padding: 20px 28px; background: #f3f2ef; flex: 1; gap: 16px; }
+    .li-jobcard { background: #fff; border-radius: 8px; padding: 20px 24px; display: flex; gap: 16px; box-shadow: 0 0 0 1px #e0dfdc; }
+    .li-logo { width: 56px; height: 56px; border-radius: 8px; background: linear-gradient(135deg, #0a66c2, #084a93); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 20px; flex-shrink: 0; }
+    .li-meta { flex: 1; }
+    .li-title { font-size: 20px; color: #000; font-weight: 600; line-height: 1.2; }
+    .li-co { font-size: 14px; color: #000; margin-top: 4px; }
+    .li-loc { font-size: 12px; color: #666; margin-top: 2px; }
+    .li-tags { display: flex; gap: 8px; margin-top: 10px; }
+    .li-pill { padding: 3px 10px; background: #eef3f8; color: #0a66c2; border-radius: 999px; font-size: 11px; font-weight: 500; }
+    .li-easy {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: #0a66c2; color: #fff; border-radius: 999px;
+      font-size: 14px; font-weight: 600; align-self: flex-start;
+      margin-top: 12px;
+    }
+    .li-body { background: #fff; border-radius: 8px; padding: 20px 24px; box-shadow: 0 0 0 1px #e0dfdc; flex: 1; }
+    .li-body-h { font-size: 14px; font-weight: 600; color: #000; margin-bottom: 8px; }
+    .li-body-p { font-size: 12px; color: #444; line-height: 1.55; margin-bottom: 6px; }
+    .li-body-list { font-size: 12px; color: #444; line-height: 1.55; padding-left: 16px; }
+
+    /* Extension popover overlay */
+    .ext-popover {
+      position: absolute;
+      top: 70px; right: 32px;
+      width: 360px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-large);
+      box-shadow: var(--shadow-deep);
+      padding: 18px;
+      z-index: 10;
+    }
+    .ext-popover-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .ext-mark { width: 32px; height: 32px; object-fit: contain; }
+    .ext-name { font-size: 14px; font-weight: 400; color: var(--heading); }
+    .ext-status { margin-left: auto; font-size: 11px; color: var(--success-text); display: inline-flex; align-items: center; gap: 4px; }
+    .ext-status::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    .ext-match { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--success-bg); border: 1px solid var(--success-border); border-radius: var(--r-relaxed); margin-bottom: 12px; }
+    .ext-match-text { font-size: 13px; color: var(--success-text); font-weight: 500; }
+    .ext-match-pct { font-size: 18px; color: var(--success-text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+    .ext-keywords { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
+
+    .ext-action { display: flex; flex-direction: column; gap: 8px; }
+    .ext-action .btn { width: 100%; justify-content: center; }
+    .ext-progress { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--body); }
+    .ext-progress-track { flex: 1; height: 4px; background: var(--tint-50); border-radius: 999px; overflow: hidden; }
+    .ext-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-deep)); border-radius: 999px; }
+
+    .browser-wrap { position: relative; }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="browser-extension" data-width="1920" data-height="1080">
+    <aside class="sidebar" data-active="browser-extension"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <div class="page-head">
+          <h1 class="page-title"><span data-icon="puzzle" data-icon-size="28"></span> Chrome extension</h1>
+          <p class="page-desc">Apply faster on LinkedIn. The extension authorizes against your account, scores each role against your resume, and submits qualifying jobs while you browse.</p>
+        </div>
+
+        <div class="ext-grid">
+
+          <!-- LEFT: Connect card -->
+          <div class="connect-card">
+            <span class="connect-status"><span class="connect-pulse"></span> Authorized · v2.4.1</span>
+            <h2 class="connect-title">Resume AI for Chrome</h2>
+            <p class="connect-sub">Connected to <strong>alex@example.com</strong>. Your CV, ATS optimizer, and job preferences are wired into LinkedIn's Easy Apply flow.</p>
+
+            <div class="connect-info">
+              <div class="connect-row"><span class="lbl">Account</span><span class="val">alex@example.com</span></div>
+              <div class="connect-row"><span class="lbl">Browser</span><span class="val">Chrome 132 · macOS</span></div>
+              <div class="connect-row"><span class="lbl">Connected</span><span class="val">Apr 18, 2026</span></div>
+              <div class="connect-row"><span class="lbl">Sessions today</span><span class="val">4</span></div>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon" data-icon="target" data-icon-size="16"></div>
+                <div class="feature-meta">
+                  <span class="feature-name">In-page ATS scoring</span>
+                  <span class="feature-desc">Score every job posting in real time against your saved resume.</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" data-icon="bot" data-icon-size="16"></div>
+                <div class="feature-meta">
+                  <span class="feature-name">Easy Apply automation</span>
+                  <span class="feature-desc">Submits qualifying jobs based on your preferences, with daily caps.</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" data-icon="shield" data-icon-size="16"></div>
+                <div class="feature-meta">
+                  <span class="feature-name">Privacy-first</span>
+                  <span class="feature-desc">Runs locally — only sends job descriptions to your Resume AI account.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="connect-actions">
+              <button class="btn btn-ghost" id="manage">Manage permissions</button>
+              <button class="btn btn-primary" id="open-cs">Open Chrome Store</button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Browser frame -->
+          <div class="browser-wrap">
+            <div class="browser-frame">
+              <div class="browser-bar">
+                <div class="traffic-lights"><span></span><span></span><span></span></div>
+                <div class="browser-tabs">
+                  <div class="browser-tab"><span data-icon="briefcase" data-icon-size="11"></span> Senior Full-Stack — LinkedIn</div>
+                </div>
+                <div class="url-bar">
+                  <span class="lock" data-icon="shield" data-icon-size="12"></span>
+                  linkedin.com/jobs/view/3914872660
+                </div>
+                <div class="ext-icons">
+                  <div class="ext-icon active" title="Resume AI"><img src="../assets/resumeai_logo_mark.png" alt="Resume AI" style="width:18px; height:18px; object-fit:contain;" /></div>
+                </div>
+              </div>
+
+              <div class="li-page">
+                <div class="li-jobcard">
+                  <div class="li-logo">AC</div>
+                  <div class="li-meta">
+                    <div class="li-title">Senior Full-Stack Engineer</div>
+                    <div class="li-co">Acme Cloud</div>
+                    <div class="li-loc">San Francisco, CA · Remote · Posted 2 days ago · 214 applicants</div>
+                    <div class="li-tags">
+                      <span class="li-pill">Full-time</span>
+                      <span class="li-pill">Senior</span>
+                      <span class="li-pill">Remote</span>
+                    </div>
+                    <div class="li-easy">
+                      <span data-icon="zap" data-icon-size="14"></span>
+                      Easy Apply
+                    </div>
+                  </div>
+                </div>
+
+                <div class="li-body">
+                  <div class="li-body-h">About the role</div>
+                  <div class="li-body-p">We're hiring a senior engineer to lead the development of our distributed event platform. You'll partner with product and design to ship features end-to-end across web, mobile, and infrastructure.</div>
+                  <div class="li-body-h" style="margin-top:14px;">What we're looking for</div>
+                  <ul class="li-body-list">
+                    <li>5+ years building production web apps with React + TypeScript</li>
+                    <li>Strong backend experience with Node.js or Go</li>
+                    <li>Comfort with Kubernetes, Docker, Kafka, and Redis at scale</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Extension popover overlay -->
+            <div class="ext-popover">
+              <div class="ext-popover-head">
+                <img class="ext-mark" src="../assets/resumeai_logo_square.webp" alt="Resume AI" />
+                <div class="ext-name">Resume AI</div>
+                <span class="ext-status">Active</span>
+              </div>
+              <div class="ext-match">
+                <span class="ext-match-text">Strong match for your profile</span>
+                <span class="ext-match-pct">94%</span>
+              </div>
+              <div style="font-size:12px; color:var(--label); margin-bottom:6px; font-weight:500;">Matched keywords</div>
+              <div class="ext-keywords">
+                <span class="badge badge-success">React</span>
+                <span class="badge badge-success">TypeScript</span>
+                <span class="badge badge-success">Node.js</span>
+                <span class="badge badge-success">Docker</span>
+                <span class="badge badge-success">PostgreSQL</span>
+              </div>
+              <div class="ext-action">
+                <button class="btn btn-primary btn-sm" id="auto-apply">
+                  <span data-icon="zap" data-icon-size="14"></span>
+                  Auto-apply with Senior FS — v3
+                </button>
+                <div class="ext-progress">
+                  <span>12 / 25 today</span>
+                  <div class="ext-progress-track"><div class="ext-progress-fill" style="width:48%;"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    document.querySelectorAll("[data-icon]").forEach(function (el) {
+      el.innerHTML = window.__rai.svg(el.dataset.icon, el.dataset.iconSize || "16");
+    });
+    const m = document.getElementById("manage");
+    if (m) m.innerHTML = window.__rai.svg("settings", 14) + m.innerHTML;
+    const cs = document.getElementById("open-cs");
+    if (cs) cs.innerHTML = window.__rai.svg("chrome", 14) + cs.innerHTML;
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["browser-extension"] = gsap.timeline({ paused: true });
+  </script>
+</body>
+</html>

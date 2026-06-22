@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — Candidate Dashboard</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="/compositions/motion.js"></script>
+  <style>
+    .hero-title .phrase { display: inline; }
+    .hero-title .word { display: inline-block; will-change: transform, opacity; }
+    .stat-value .num { display: inline-block; font-variant-numeric: tabular-nums; }
+    .section-title { display: inline-block; }
+    .section-rule { transform-origin: 0% 50%; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--r-large);
+      background: color-mix(in srgb, var(--border-soft) 20%, var(--surface));
+      padding: 36px 44px;
+      box-shadow: var(--shadow-standard);
+    }
+    .hero-glow-tr { position: absolute; top: -120px; right: -120px; width: 320px; height: 320px; border-radius: 50%; background: var(--primary-tint-8); filter: blur(60px); pointer-events: none; }
+    .hero-glow-bl { position: absolute; bottom: -120px; left: -80px; width: 360px; height: 360px; border-radius: 50%; background: var(--primary-tint-8); filter: blur(60px); pointer-events: none; }
+    .hero-row { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: var(--r-relaxed);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+      font-size: 12px; color: var(--body); font-weight: 400;
+    }
+    .hero-title { margin-top: 16px; font-size: 38px; font-weight: 300; letter-spacing: -0.7px; line-height: 1.1; color: var(--heading); max-width: 720px; }
+    .hero-title .muted { color: var(--body); }
+    .hero-sub { margin-top: 12px; font-size: 16px; color: var(--body); max-width: 640px; line-height: 1.5; }
+    .hero-cta { display: flex; gap: 10px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-relaxed); padding: 18px 20px; box-shadow: var(--shadow-ambient); }
+    .stat-row { display: flex; justify-content: space-between; align-items: flex-start; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--label); font-weight: 500; }
+    .stat-icon-wrap { width: 28px; height: 28px; border-radius: var(--r-standard); background: var(--tint-50); color: var(--body); display: grid; place-items: center; }
+    .stat-value { margin-top: 12px; font-size: 32px; font-weight: 300; letter-spacing: -0.6px; color: var(--heading); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+    .stat-hint { margin-top: 4px; font-size: 12px; color: var(--body); }
+
+    .section { margin-top: 32px; }
+    .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .section-title { font-size: 22px; font-weight: 300; letter-spacing: -0.22px; color: var(--heading); }
+    .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+    .hub-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .hub-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .hub { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); padding: 20px; box-shadow: var(--shadow-ambient); position: relative; }
+    .hub-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .hub-icon { width: 44px; height: 44px; border-radius: var(--r-relaxed); background: var(--tint-50); border: 1px solid var(--border); color: var(--heading); display: grid; place-items: center; }
+    .hub-arrow { color: var(--body); opacity: 0.4; }
+    .hub-title { margin-top: 12px; font-size: 17px; font-weight: 400; color: var(--heading); letter-spacing: -0.2px; }
+    .hub-desc { margin-top: 6px; font-size: 13px; color: var(--body); line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="dashboard" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+    <aside class="sidebar" data-active="dashboard"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <section class="hero">
+          <div class="hero-glow-tr"></div>
+          <div class="hero-glow-bl"></div>
+          <div class="hero-row">
+            <div>
+              <span class="hero-pill" id="hero-pill-icon">Candidate workspace</span>
+              <h1 class="hero-title" id="hero-title"><span class="phrase phrase-1"><span class="word">Hi,</span> <span class="word">Alex.</span></span> <span class="phrase phrase-2 muted"><span class="word">Where</span> <span class="word">do</span> <span class="word">you</span> <span class="word">want</span> <span class="word">to</span> <span class="word">go</span> <span class="word">next?</span></span></h1>
+              <p class="hero-sub">Jump into resumes, applications, or job discovery. Everything you need for your search lives in one place.</p>
+            </div>
+            <div class="hero-cta">
+              <button class="btn btn-primary" id="cta-profile">View profile</button>
+              <button class="btn btn-ghost" id="cta-builder">Open builder</button>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat" data-stat="matches">
+              <div class="stat-row"><span class="stat-label">Strong matches</span><div class="stat-icon-wrap" data-icon="sparkles"></div></div>
+              <div class="stat-value"><span class="num">12</span></div>
+              <div class="stat-hint">Roles that fit your profile</div>
+            </div>
+            <div class="stat" data-stat="applications">
+              <div class="stat-row"><span class="stat-label">Recorded applications</span><div class="stat-icon-wrap" data-icon="send"></div></div>
+              <div class="stat-value"><span class="num">47</span></div>
+              <div class="stat-hint">Via extension &amp; automation</div>
+            </div>
+            <div class="stat" data-stat="saved">
+              <div class="stat-row"><span class="stat-label">Saved jobs</span><div class="stat-icon-wrap" data-icon="bookmark"></div></div>
+              <div class="stat-value"><span class="num">23</span></div>
+              <div class="stat-hint">Jobs saved for later</div>
+            </div>
+            <div class="stat" data-stat="today">
+              <div class="stat-row"><span class="stat-label">Applications today</span><div class="stat-icon-wrap" data-icon="zap"></div></div>
+              <div class="stat-value"><span class="num">5</span> <span style="color:var(--body); font-size: 22px;">/ 15</span></div>
+              <div class="stat-hint">Tracked against your daily limit</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><h2 class="section-title">Resumes</h2><span class="section-rule"></span></div>
+          <div class="hub-grid-2">
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="upload" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">My resume</div><div class="hub-desc">Upload a PDF or manage your primary CV file.</div></div>
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="file" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">Resume builder</div><div class="hub-desc">Create and edit resumes with templates and AI tools.</div></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><h2 class="section-title">Job search &amp; automation</h2><span class="section-rule"></span></div>
+          <div class="hub-grid-5">
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="briefcase" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">Job preferences</div><div class="hub-desc">Tell us what roles and locations you care about.</div></div>
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="bot" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">Job applications</div><div class="hub-desc">Track LinkedIn automation and application status.</div></div>
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="zap" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">Recommended jobs</div><div class="hub-desc">See roles matched to your profile and skills.</div></div>
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="target" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">ATS optimizer</div><div class="hub-desc">Tune your resume for applicant tracking systems.</div></div>
+            <div class="hub"><div class="hub-row"><div class="hub-icon" data-icon="puzzle" data-icon-size="20"></div><div class="hub-arrow" data-icon="arrowUpRight" data-icon-size="16"></div></div><div class="hub-title">Chrome extension</div><div class="hub-desc">Apply faster with the browser extension.</div></div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    // Fill icon placeholders with [data-icon] across the page.
+    document.querySelectorAll("[data-icon]").forEach(function (el) {
+      const name = el.dataset.icon;
+      const size = el.dataset.iconSize || "16";
+      el.innerHTML = window.__rai.svg(name, size);
+    });
+    // Hero pill needs a leading icon.
+    const pill = document.getElementById("hero-pill-icon");
+    if (pill) pill.innerHTML = window.__rai.svg("dashboard", 14) + pill.innerHTML;
+    // CTA buttons get leading icons.
+    const p = document.getElementById("cta-profile");
+    if (p) p.innerHTML = window.__rai.svg("profile", 16) + p.innerHTML;
+    const b = document.getElementById("cta-builder");
+    if (b) b.innerHTML = window.__rai.svg("sparkles", 16) + b.innerHTML;
+
+    // ─── Scene: Candidate Dashboard (10s) — Apple choreography ─────────
+    // Eye-path: hero → CTA → stats → sections → hubs. No simultaneous landings.
+    var m = window.__motion;
+    var tl = gsap.timeline({ paused: true });
+
+    // ─── 0.00s — Initial state ───────────────────────────────────────
+    tl.set(".hero",                   { opacity: 0, y: 24, scale: 0.97, transformOrigin: "50% 0%" }, 0);
+    tl.set(".hero-glow-tr, .hero-glow-bl", { opacity: 0, scale: 0.92, transformOrigin: "50% 50%" }, 0);
+    tl.set(".hero-pill",              { opacity: 0, y: -8 }, 0);
+    tl.set(".hero-title .word",       { opacity: 0, y: 12 }, 0);
+    tl.set(".hero-sub",               { clipPath: "inset(0 100% 0 0)", webkitClipPath: "inset(0 100% 0 0)" }, 0);
+    tl.set("#cta-profile, #cta-builder", { opacity: 0, y: 8 }, 0);
+    tl.set(".stat",                   { opacity: 0, y: 16, scale: 0.96, transformOrigin: "50% 0%" }, 0);
+    tl.set(".stat .num",              { display: "inline-block", transformOrigin: "50% 50%" }, 0);
+    tl.set(".section-title",          { clipPath: "inset(0 100% 0 0)", webkitClipPath: "inset(0 100% 0 0)" }, 0);
+    tl.set(".section-rule",           { scaleX: 0 }, 0);
+    tl.set(".hub",                    { opacity: 0, y: 20, scale: 0.97, transformOrigin: "50% 0%" }, 0);
+
+    // Reset counter text to 0 (will tick up)
+    document.querySelectorAll(".stat .num").forEach(function (el) { el.textContent = "0"; });
+
+    // ─── 0.20s — Hero frame lands ─────────────────────────────────────
+    tl.to(".hero", { opacity: 1, y: 0, scale: 1, duration: m.uiSlow, ease: m.springBrisk }, 0.20);
+
+    // ─── 0.35s — Atmosphere: glows fade in, then continuous breathe ───
+    tl.to(".hero-glow-tr, .hero-glow-bl", {
+      opacity: 1, scale: 1, duration: m.hero, ease: m.settleLong, stagger: 0.08,
+    }, 0.35);
+    tl.to(".hero-glow-tr, .hero-glow-bl", {
+      scale: 1.04, duration: 4.0, ease: "sine.inOut", repeat: 1, yoyo: true,
+    }, 1.20);
+
+    // ─── 0.55s — Hero pill ────────────────────────────────────────────
+    tl.to(".hero-pill", { opacity: 1, y: 0, duration: m.micro, ease: m.springSoft }, 0.55);
+
+    // ─── 0.75s — Phrase 1: "Hi, Alex." word-by-word ───────────────────
+    tl.to(".phrase-1 .word", {
+      opacity: 1, y: 0, duration: m.micro, ease: m.smoothOut, stagger: 0.05,
+    }, 0.75);
+
+    // ─── 1.15s — Phrase 2: "Where do you want to go next?" ────────────
+    tl.to(".phrase-2 .word", {
+      opacity: 1, y: 0, duration: m.micro, ease: m.smoothOut, stagger: 0.06,
+    }, 1.15);
+
+    // ─── 1.80s — Subhead clip-mask wipe ───────────────────────────────
+    tl.to(".hero-sub", {
+      clipPath: "inset(0 0% 0 0)", webkitClipPath: "inset(0 0% 0 0)",
+      duration: m.ui, ease: m.smoothInOut,
+    }, 1.80);
+
+    // ─── 2.20s — CTA pair lands ───────────────────────────────────────
+    tl.to(["#cta-profile", "#cta-builder"], {
+      opacity: 1, y: 0, duration: m.micro, ease: m.springLively, stagger: 0.10,
+    }, 2.20);
+
+    // ─── 2.60s — Primary CTA pulse ────────────────────────────────────
+    tl.to("#cta-profile", {
+      keyframes: [
+        { scale: 1.04, duration: 0.18, ease: m.springLively },
+        { scale: 1.00, duration: 0.22, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+    }, 2.60);
+
+    // ─── 2.80s — Stat tiles (4) enter ─────────────────────────────────
+    tl.to(".stat", {
+      opacity: 1, y: 0, scale: 1, duration: m.ui, ease: m.springBrisk, stagger: 0.10,
+    }, 2.80);
+
+    // ─── 3.20s — Counters tick + snap-flash on land (offset 0.10/tile)
+    var statTargets = [
+      { sel: '.stat[data-stat="matches"] .num',      to: 12 },
+      { sel: '.stat[data-stat="applications"] .num', to: 47 },
+      { sel: '.stat[data-stat="saved"] .num',        to: 23 },
+      { sel: '.stat[data-stat="today"] .num',        to: 5  },
+    ];
+    statTargets.forEach(function (c, i) {
+      var el = document.querySelector(c.sel);
+      if (!el) return;
+      var obj = { v: 0 };
+      var start = 3.20 + i * 0.10;
+      tl.to(obj, {
+        v: c.to, duration: 0.98, ease: m.settle,
+        onUpdate: function () { el.textContent = String(Math.round(obj.v)); },
+      }, start);
+      tl.to(el, {
+        keyframes: [
+          { scale: 1.08, duration: 0.16, ease: m.springLively },
+          { scale: 1.00, duration: 0.20, ease: m.smoothOut },
+        ],
+        transformOrigin: "50% 50%",
+      }, start + 0.98);
+    });
+
+    // ─── 4.60s — Section 1 ("Resumes"): title wipe + rule draw ────────
+    tl.to(".section:nth-of-type(1) .section-title", {
+      clipPath: "inset(0 0% 0 0)", webkitClipPath: "inset(0 0% 0 0)",
+      duration: m.ui, ease: m.smoothInOut,
+    }, 4.60);
+    tl.to(".section:nth-of-type(1) .section-rule", {
+      scaleX: 1, duration: 0.50, ease: m.smoothInOut,
+    }, 4.85);
+
+    // ─── 4.95s — Resume hubs (2) ──────────────────────────────────────
+    tl.to(".hub-grid-2 .hub", {
+      opacity: 1, y: 0, scale: 1, duration: m.ui, ease: m.springBrisk, stagger: 0.12,
+    }, 4.95);
+
+    // ─── 5.65s — Section 2 ("Job search & automation"): title + rule ──
+    tl.to(".section:nth-of-type(2) .section-title", {
+      clipPath: "inset(0 0% 0 0)", webkitClipPath: "inset(0 0% 0 0)",
+      duration: m.ui, ease: m.smoothInOut,
+    }, 5.65);
+    tl.to(".section:nth-of-type(2) .section-rule", {
+      scaleX: 1, duration: 0.50, ease: m.smoothInOut,
+    }, 5.90);
+
+    // ─── 6.00s — Job hubs (5) cascade L→R ─────────────────────────────
+    tl.to(".hub-grid-5 .hub", {
+      opacity: 1, y: 0, scale: 1, duration: m.ui, ease: m.springBrisk, stagger: 0.08,
+    }, 6.00);
+
+    // ─── 7.30s — Hub icons wake (wave L→R) ────────────────────────────
+    tl.to(".hub-icon", {
+      keyframes: [
+        { scale: 1.05, duration: 0.18, ease: m.springLively },
+        { scale: 1.00, duration: 0.20, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+      stagger: 0.04,
+    }, 7.30);
+
+    // ─── 8.10s — Hub arrows wake (opacity wave L→R) ───────────────────
+    tl.to(".hub-arrow", {
+      keyframes: [
+        { opacity: 0.85, duration: 0.20, ease: m.smoothOut },
+        { opacity: 0.40, duration: 0.30, ease: m.smoothOut },
+      ],
+      stagger: 0.04,
+    }, 8.10);
+
+    // ─── 8.90s — Final camera push (settled) ──────────────────────────
+    tl.to(".content", {
+      scale: 1.012, duration: m.camera, ease: m.smoothInOut, transformOrigin: "50% 50%",
+    }, 8.90);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["dashboard"] = tl;
+  </script>
+</body>
+</html>

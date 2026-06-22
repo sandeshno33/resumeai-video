@@ -1,0 +1,40 @@
+# Resume AI — narration script
+# Target: ~150 words, 72 seconds at ~125 wpm
+# Voice: confident, warm, calm. Pauses between sentences are intentional.
+# Each block maps to one scene.
+
+# Scene 1 — Pain hook (0-4s) | 9 words, 4s with pause
+You apply to a hundred jobs.
+You hear back from three.
+
+# Scene 2 — Brand reveal (4-8.5s) | 8 words, 4.5s with pause
+Resume AI changes that.
+
+# Scene 3 — Dashboard land (8.5-17s) | 22 words, 8.5s
+Your candidate workspace.
+Resumes, applications, AI matching — every part of the search lives in one place.
+
+# Scene 4 — Job preferences (17-25s) | 15 words, 8s
+Tell it what you want.
+Roles. Locations. Compensation. The fit math runs on every job, automatically.
+
+# Scene 5 — ATS Optimizer (25-37s) | 22 words, 12s
+Drop in any job posting.
+The ATS optimizer scores your resume in seconds —
+then rewrites it to win the keywords you're missing.
+
+# Scene 6 — Recommended jobs (37-45s) | 12 words, 8s
+It surfaces the roles you'd actually take.
+Ranked by real fit, not noise.
+
+# Scene 7 — Chrome extension (45-58s) | 19 words, 13s
+And the Chrome extension applies for you.
+On LinkedIn. With the right resume. Even while you sleep.
+
+# Scene 8 — Payoff stats (58-66s) | 12 words, 8s
+Forty-seven applications a week.
+Six interviews this month.
+Zero hours lost.
+
+# Scene 9 — CTA (66-72s) | 4 words, 6s
+Resume AI. Start free.

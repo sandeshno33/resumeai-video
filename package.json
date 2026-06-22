@@ -8,14 +8,18 @@
     "build:9x16": "remotion render src/Root.tsx ResumeAI-9x16  --output out/resumeai_9x16_1080p.mp4  --codec h264 --crf 18 --image-format jpeg",
     "build:1x1": "remotion render src/Root.tsx ResumeAI-1x1   --output out/resumeai_1x1_1080p.mp4   --codec h264 --crf 18 --image-format jpeg",
     "build:all": "npm run build:16x9 && npm run build:9x16 && npm run build:1x1",
+    "build:nepali:16x9": "remotion render src/Root.tsx ResumeAI-Nepali-16x9 --output out/resumeai_nepali_16x9.mp4 --codec h264 --crf 18 --image-format jpeg",
+    "build:nepali:9x16": "remotion render src/Root.tsx ResumeAI-Nepali-9x16 --output out/resumeai_nepali_9x16.mp4 --codec h264 --crf 18 --image-format jpeg",
+    "build:nepali:1x1": "remotion render src/Root.tsx ResumeAI-Nepali-1x1 --output out/resumeai_nepali_1x1.mp4 --codec h264 --crf 18 --image-format jpeg",
+    "build:nepali:all": "npm run build:nepali:16x9 && npm run build:nepali:9x16 && npm run build:nepali:1x1",
     "preview": "remotion studio src/Root.tsx"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.0",
-    "@remotion/google-fonts": "^4.0.470",
+    "@remotion/cli": "4.0.477",
+    "@remotion/google-fonts": "4.0.477",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "remotion": "^4.0.0"
+    "remotion": "4.0.477"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

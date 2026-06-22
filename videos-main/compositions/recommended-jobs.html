@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — Recommended Jobs</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="/compositions/motion.js"></script>
+  <style>
+    .page-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .page-title { display: flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 300; letter-spacing: -0.64px; color: var(--heading); }
+    .page-desc { font-size: 16px; color: var(--body); max-width: 720px; line-height: 1.5; }
+
+    .toolbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-relaxed); margin-bottom: 16px; }
+    .toolbar-left { display: flex; align-items: center; gap: 16px; }
+    .toolbar-input { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r-standard); width: 360px; color: var(--body); font-size: 14px; }
+    .toolbar-input span { color: var(--body); font-size: 14px; }
+    .toolbar-chips { display: flex; gap: 8px; }
+    .toolbar-right { display: flex; align-items: center; gap: 12px; color: var(--body); font-size: 13px; }
+
+    .jobs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .job-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); padding: 20px; box-shadow: var(--shadow-ambient); display: flex; flex-direction: column; gap: 12px; }
+    .job-tags { display: flex; gap: 6px; }
+    .job-title { font-size: 18px; font-weight: 400; color: var(--heading); letter-spacing: -0.2px; line-height: 1.25; }
+    .job-company { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--body); }
+    .job-info-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .job-salary { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--tint-50); border-radius: var(--r-standard); }
+    .job-salary .icon { color: var(--primary); width: 16px; height: 16px; }
+    .job-salary-text { font-size: 14px; color: var(--label); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+    .job-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .job-stats { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--body); padding-top: 4px; border-top: 1px solid var(--border); padding-top: 12px; }
+    .job-stats span { display: inline-flex; align-items: center; gap: 4px; }
+    .job-stats .ago { margin-left: auto; }
+    .job-actions { display: flex; gap: 8px; padding-top: 4px; }
+    .job-actions .btn-primary { flex: 1; justify-content: center; }
+    .job-match {
+      position: absolute; top: 14px; right: 14px;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px;
+      background: var(--success-bg); color: var(--success-text);
+      border: 1px solid var(--success-border);
+      border-radius: 999px; font-size: 12px; font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .job-card { position: relative; }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="recommended-jobs" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+    <aside class="sidebar" data-active="recommended-jobs"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <div class="page-head">
+          <h1 class="page-title"><span data-icon="zap" data-icon-size="28"></span> Recommended jobs</h1>
+          <p class="page-desc">Roles matched to your profile, ranked by skills fit, location, and seniority.</p>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="toolbar-input">
+              <span data-icon="search" data-icon-size="14"></span>
+              <span>Senior Engineer · San Francisco · Remote</span>
+            </div>
+            <div class="toolbar-chips">
+              <span class="badge badge-primary">Remote</span>
+              <span class="badge badge-neutral">Senior</span>
+              <span class="badge badge-neutral">Full-time</span>
+            </div>
+          </div>
+          <div class="toolbar-right"><span class="tabular">126</span> roles · sorted by best match</div>
+        </div>
+
+        <div class="jobs-grid">
+
+          <!-- Card 1 — 94% match -->
+          <div class="job-card">
+            <span class="job-match">94% match</span>
+            <div class="job-tags">
+              <span class="badge badge-warning">Sponsored</span>
+              <span class="badge badge-neutral"><span data-icon="globe" data-icon-size="11"></span> Remote</span>
+            </div>
+            <div class="job-title">Senior Full-Stack Engineer</div>
+            <div class="job-company">
+              <span data-icon="building" data-icon-size="14"></span>
+              Acme Cloud · 501–1,000 · United States
+            </div>
+            <div class="job-info-badges">
+              <span class="badge badge-neutral"><span data-icon="mapPin" data-icon-size="11"></span> San Francisco, CA</span>
+              <span class="badge badge-neutral"><span data-icon="briefcase" data-icon-size="11"></span> Full-time</span>
+              <span class="badge badge-primary">Senior</span>
+            </div>
+            <div class="job-salary">
+              <span data-icon="dollar" data-icon-size="16"></span>
+              <span class="job-salary-text">$185k – $235k</span>
+              <span class="job-salary-text" style="font-size:12px; color:var(--body);">/ year</span>
+            </div>
+            <div class="job-skills">
+              <span class="badge badge-neutral">React</span>
+              <span class="badge badge-neutral">TypeScript</span>
+              <span class="badge badge-neutral">GraphQL</span>
+              <span class="badge badge-neutral">AWS</span>
+              <span class="badge badge-neutral">Kubernetes</span>
+              <span class="badge badge-neutral" style="color:var(--body)">+3 more</span>
+            </div>
+            <div class="job-stats">
+              <span><span data-icon="profile" data-icon-size="12"></span> <span class="tabular">214</span> applicants</span>
+              <span><span data-icon="eye" data-icon-size="12"></span> <span class="tabular">1,832</span> views</span>
+              <span class="ago"><span data-icon="clock" data-icon-size="12"></span> <span class="tabular">2 days ago</span></span>
+            </div>
+            <div class="job-actions">
+              <button class="btn btn-primary btn-sm" id="apply-1">Apply</button>
+              <button class="btn btn-ghost btn-sm" id="save-1"></button>
+            </div>
+          </div>
+
+          <!-- Card 2 — 91% -->
+          <div class="job-card">
+            <span class="job-match">91% match</span>
+            <div class="job-tags">
+              <span class="badge badge-neutral"><span data-icon="globe" data-icon-size="11"></span> Remote</span>
+            </div>
+            <div class="job-title">Staff Software Engineer, Platform</div>
+            <div class="job-company">
+              <span data-icon="building" data-icon-size="14"></span>
+              Northwind Labs · 201–500 · United States
+            </div>
+            <div class="job-info-badges">
+              <span class="badge badge-neutral"><span data-icon="mapPin" data-icon-size="11"></span> Remote — US</span>
+              <span class="badge badge-neutral"><span data-icon="briefcase" data-icon-size="11"></span> Full-time</span>
+              <span class="badge badge-primary">Staff</span>
+            </div>
+            <div class="job-salary">
+              <span data-icon="dollar" data-icon-size="16"></span>
+              <span class="job-salary-text">$210k – $280k</span>
+              <span class="job-salary-text" style="font-size:12px; color:var(--body);">/ year</span>
+            </div>
+            <div class="job-skills">
+              <span class="badge badge-neutral">Go</span>
+              <span class="badge badge-neutral">Kubernetes</span>
+              <span class="badge badge-neutral">Terraform</span>
+              <span class="badge badge-neutral">PostgreSQL</span>
+              <span class="badge badge-neutral">gRPC</span>
+            </div>
+            <div class="job-stats">
+              <span><span data-icon="profile" data-icon-size="12"></span> <span class="tabular">87</span> applicants</span>
+              <span><span data-icon="eye" data-icon-size="12"></span> <span class="tabular">912</span> views</span>
+              <span class="ago"><span data-icon="clock" data-icon-size="12"></span> <span class="tabular">Today</span></span>
+            </div>
+            <div class="job-actions">
+              <button class="btn btn-primary btn-sm" id="apply-2">Apply</button>
+              <button class="btn btn-ghost btn-sm" id="save-2"></button>
+            </div>
+          </div>
+
+          <!-- Card 3 — 88% -->
+          <div class="job-card">
+            <span class="job-match">88% match</span>
+            <div class="job-tags">
+              <span class="badge badge-neutral"><span data-icon="globe" data-icon-size="11"></span> Remote</span>
+            </div>
+            <div class="job-title">Senior Frontend Engineer, Design Systems</div>
+            <div class="job-company">
+              <span data-icon="building" data-icon-size="14"></span>
+              Lumen &amp; Co · 51–200 · United Kingdom
+            </div>
+            <div class="job-info-badges">
+              <span class="badge badge-neutral"><span data-icon="mapPin" data-icon-size="11"></span> London, UK</span>
+              <span class="badge badge-neutral"><span data-icon="briefcase" data-icon-size="11"></span> Full-time</span>
+              <span class="badge badge-primary">Senior</span>
+            </div>
+            <div class="job-salary">
+              <span data-icon="dollar" data-icon-size="16"></span>
+              <span class="job-salary-text">£95k – £130k</span>
+              <span class="job-salary-text" style="font-size:12px; color:var(--body);">/ year</span>
+            </div>
+            <div class="job-skills">
+              <span class="badge badge-neutral">React</span>
+              <span class="badge badge-neutral">TypeScript</span>
+              <span class="badge badge-neutral">Storybook</span>
+              <span class="badge badge-neutral">Design Tokens</span>
+            </div>
+            <div class="job-stats">
+              <span><span data-icon="profile" data-icon-size="12"></span> <span class="tabular">42</span> applicants</span>
+              <span><span data-icon="eye" data-icon-size="12"></span> <span class="tabular">486</span> views</span>
+              <span class="ago"><span data-icon="clock" data-icon-size="12"></span> <span class="tabular">Yesterday</span></span>
+            </div>
+            <div class="job-actions">
+              <button class="btn btn-primary btn-sm" id="apply-3">Apply</button>
+              <button class="btn btn-ghost btn-sm" id="save-3"></button>
+            </div>
+          </div>
+
+          <!-- Card 4 — 85% -->
+          <div class="job-card">
+            <span class="job-match">85% match</span>
+            <div class="job-tags">
+              <span class="badge badge-neutral"><span data-icon="globe" data-icon-size="11"></span> Remote</span>
+            </div>
+            <div class="job-title">Principal Engineer, Developer Experience</div>
+            <div class="job-company">
+              <span data-icon="building" data-icon-size="14"></span>
+              Vector AI · 51–200 · United States
+            </div>
+            <div class="job-info-badges">
+              <span class="badge badge-neutral"><span data-icon="mapPin" data-icon-size="11"></span> New York, NY</span>
+              <span class="badge badge-neutral"><span data-icon="briefcase" data-icon-size="11"></span> Full-time</span>
+              <span class="badge badge-neutral">Principal</span>
+            </div>
+            <div class="job-salary">
+              <span data-icon="dollar" data-icon-size="16"></span>
+              <span class="job-salary-text">$240k – $310k</span>
+              <span class="job-salary-text" style="font-size:12px; color:var(--body);">/ year</span>
+            </div>
+            <div class="job-skills">
+              <span class="badge badge-neutral">Rust</span>
+              <span class="badge badge-neutral">TypeScript</span>
+              <span class="badge badge-neutral">Bazel</span>
+              <span class="badge badge-neutral">CI/CD</span>
+            </div>
+            <div class="job-stats">
+              <span><span data-icon="profile" data-icon-size="12"></span> <span class="tabular">31</span> applicants</span>
+              <span><span data-icon="eye" data-icon-size="12"></span> <span class="tabular">298</span> views</span>
+              <span class="ago"><span data-icon="clock" data-icon-size="12"></span> <span class="tabular">3 days ago</span></span>
+            </div>
+            <div class="job-actions">
+              <button class="btn btn-primary btn-sm" id="apply-4">Apply</button>
+              <button class="btn btn-ghost btn-sm" id="save-4"></button>
+            </div>
+          </div>
+
+          <!-- Card 5 — 82% -->
+          <div class="job-card">
+            <span class="job-match">82% match</span>
+            <div class="job-tags">
+              <span class="badge badge-warning">Sponsored</span>
+            </div>
+            <div class="job-title">Engineering Manager, Growth</div>
+            <div class="job-company">
+              <span data-icon="building" data-icon-size="14"></span>
+              Helio · 1,001–5,000 · Germany
+            </div>
+            <div class="job-info-badges">
+              <span class="badge badge-neutral"><span data-icon="mapPin" data-icon-size="11"></span> Berlin, DE</span>
+              <span class="badge badge-neutral"><span data-icon="briefcase" data-icon-size="11"></span> Full-time</span>
+              <span class="badge badge-primary">Manager</span>
+            </div>
+            <div class="job-salary">
+              <span data-icon="dollar" data-icon-size="16"></span>
+              <span class="job-salary-text">€110k – €145k</span>
+              <span class="job-salary-text" style="font-size:12px; color:var(--body);">/ year</span>
+            </div>
+            <div class="job-skills">
+              <span class="badge badge-neutral">Leadership</span>
+              <span class="badge badge-neutral">Experimentation</span>
+              <span class="badge badge-neutral">SQL</span>
+              <span class="badge badge-neutral">A/B Testing</span>
+            </div>
+            <div class="job-stats">
+              <span><span data-icon="profile" data-icon-size="12"></span> <span class="tabular">156</span> applicants</span>
+              <span><span data-icon="eye" data-icon-size="12"></span> <span class="tabular">1,204</span> views</span>
+              <span class="ago"><span data-icon="clock" data-icon-size="12"></span> <span class="tabular">5 days ago</span></span>
+            </div>
+            <div class="job-actions">
+              <button class="btn btn-primary btn-sm" id="apply-5">Apply</button>
+              <button class="btn btn-ghost btn-sm" id="save-5"></button>
+            </div>
+          </div>
+
+          <!-- Card 6 — 79% -->
+          <div class="job-card">
+            <span class="job-match">79% match</span>
+            <div class="job-tags">
+              <span class="badge badge-neutral"><span data-icon="globe" data-icon-size="11"></span> Remote</span>
+            </div>
+            <div class="job-title">Senior Backend Engineer, Payments</div>
+            <div class="job-company">
+              <span data-icon="building" data-icon-size="14"></span>
+              Strand Financial · 1,001–5,000 · Singapore
+            </div>
+            <div class="job-info-badges">
+              <span class="badge badge-neutral"><span data-icon="mapPin" data-icon-size="11"></span> Singapore</span>
+              <span class="badge badge-neutral"><span data-icon="briefcase" data-icon-size="11"></span> Full-time</span>
+              <span class="badge badge-primary">Senior</span>
+            </div>
+            <div class="job-salary">
+              <span data-icon="dollar" data-icon-size="16"></span>
+              <span class="job-salary-text">SGD 160k – 210k</span>
+              <span class="job-salary-text" style="font-size:12px; color:var(--body);">/ year</span>
+            </div>
+            <div class="job-skills">
+              <span class="badge badge-neutral">Java</span>
+              <span class="badge badge-neutral">Kafka</span>
+              <span class="badge badge-neutral">PostgreSQL</span>
+              <span class="badge badge-neutral">Microservices</span>
+            </div>
+            <div class="job-stats">
+              <span><span data-icon="profile" data-icon-size="12"></span> <span class="tabular">94</span> applicants</span>
+              <span><span data-icon="eye" data-icon-size="12"></span> <span class="tabular">722</span> views</span>
+              <span class="ago"><span data-icon="clock" data-icon-size="12"></span> <span class="tabular">1 week ago</span></span>
+            </div>
+            <div class="job-actions">
+              <button class="btn btn-primary btn-sm" id="apply-6">Apply</button>
+              <button class="btn btn-ghost btn-sm" id="save-6"></button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    document.querySelectorAll("[data-icon]").forEach(function (el) {
+      el.innerHTML = window.__rai.svg(el.dataset.icon, el.dataset.iconSize || "16");
+    });
+    // Apply button leading icons + Save bookmark icons
+    for (let i = 1; i <= 6; i++) {
+      const a = document.getElementById("apply-" + i);
+      if (a) a.innerHTML = window.__rai.svg("arrowUpRight", 14) + a.innerHTML;
+      const s = document.getElementById("save-" + i);
+      if (s) s.innerHTML = window.__rai.svg("bookmark", 14);
+    }
+
+    // ─── Scene: Recommended Jobs (10s) — Apple choreography ────────────
+    // Story: AI is matching jobs to your profile, scoring each one live.
+    // Eye-path: header → toolbar (search wipes in, chips pop, count ticks)
+    //   → cards cascade in → match-% ticks per card (wave) → top match
+    //   (94%) gets emphasis → hero Apply CTA pulses → camera settles.
+    var m = window.__motion;
+    var tl = gsap.timeline({ paused: true });
+
+    // Cache match-% targets and reset to "0% match" so they tick up
+    var matchEls = document.querySelectorAll(".job-match");
+    var matchTargets = [];
+    matchEls.forEach(function (el) {
+      var n = el.textContent.match(/(\d+)/);
+      matchTargets.push({ el: el, value: n ? parseInt(n[1], 10) : 0 });
+      el.textContent = "0% match";
+    });
+
+    // Cache result count "126" and reset to 0
+    var resultCountEl = document.querySelector(".toolbar-right .tabular");
+    var resultTarget = resultCountEl ? parseInt(resultCountEl.textContent.replace(/,/g, ""), 10) : 0;
+    if (resultCountEl) resultCountEl.textContent = "0";
+
+    // ─── 0.00s — Initial state ────────────────────────────────────────
+    tl.set(".page-head",          { opacity: 0, y: 12 }, 0);
+    tl.set(".toolbar",            { opacity: 0, y: 12, scale: 0.98, transformOrigin: "50% 0%" }, 0);
+    tl.set(".toolbar-input",      { clipPath: "inset(0 100% 0 0)", webkitClipPath: "inset(0 100% 0 0)" }, 0);
+    tl.set(".toolbar-chips .badge", { opacity: 0, scale: 0.85, transformOrigin: "50% 50%" }, 0);
+    tl.set(".job-card",           { opacity: 0, y: 18, scale: 0.96, transformOrigin: "50% 0%" }, 0);
+    tl.set(".job-match",          { opacity: 0, scale: 0.8, transformOrigin: "50% 50%" }, 0);
+
+    // ─── 0.20s — Page header ──────────────────────────────────────────
+    tl.to(".page-head", { opacity: 1, y: 0, duration: m.micro, ease: m.smoothOut }, 0.20);
+
+    // ─── 0.55s — Toolbar frame lands ──────────────────────────────────
+    tl.to(".toolbar", { opacity: 1, y: 0, scale: 1, duration: m.uiSlow, ease: m.springBrisk }, 0.55);
+
+    // ─── 0.85s — Search query wipes L→R (feels like AI populating it) ─
+    tl.to(".toolbar-input", {
+      clipPath: "inset(0 0% 0 0)", webkitClipPath: "inset(0 0% 0 0)",
+      duration: 0.60, ease: m.smoothInOut,
+    }, 0.85);
+
+    // ─── 1.45s — Filter chips pop in (3, stagger) ─────────────────────
+    tl.to(".toolbar-chips .badge", {
+      opacity: 1, scale: 1, duration: m.micro, ease: m.springLively, stagger: 0.08,
+    }, 1.45);
+
+    // ─── 1.75s — Result count ticks 0 → 126 ───────────────────────────
+    var rcObj = { v: 0 };
+    tl.to(rcObj, {
+      v: resultTarget, duration: 0.85, ease: m.settle,
+      onUpdate: function () { if (resultCountEl) resultCountEl.textContent = String(Math.round(rcObj.v)); },
+    }, 1.75);
+
+    // ─── 2.70s — Cards cascade in (6 cards, stagger 0.10, diagonal feel)
+    tl.to(".job-card", {
+      opacity: 1, y: 0, scale: 1, duration: m.ui, ease: m.springBrisk, stagger: 0.10,
+    }, 2.70);
+
+    // ─── 3.50s — Match badges pop + tick (wave, 0.13s stagger per card)
+    // The "AI scoring" beat: each card's match-% counts up from 0.
+    matchTargets.forEach(function (mt, i) {
+      var popStart = 3.50 + i * 0.13;
+      tl.to(mt.el, { opacity: 1, scale: 1, duration: m.micro, ease: m.springLively }, popStart);
+      var obj = { v: 0 };
+      tl.to(obj, {
+        v: mt.value, duration: 0.70, ease: m.settle,
+        onUpdate: function () { mt.el.textContent = Math.round(obj.v) + "% match"; },
+      }, popStart + 0.08);
+      // Snap-flash after tick lands
+      tl.to(mt.el, {
+        keyframes: [
+          { scale: 1.10, duration: 0.16, ease: m.springLively },
+          { scale: 1.00, duration: 0.20, ease: m.smoothOut },
+        ],
+      }, popStart + 0.80);
+    });
+
+    // ─── 5.55s — Hero match (94%) gets glow emphasis — the top result ─
+    tl.to(".job-card:first-child .job-match", {
+      keyframes: [
+        { scale: 1.16, boxShadow: "0 0 0 6px rgba(21,190,83,0.20)", duration: 0.22, ease: m.springLively },
+        { scale: 1.00, boxShadow: "0 0 0 0 rgba(21,190,83,0)",      duration: 0.32, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+    }, 5.55);
+
+    // ─── 6.20s — Hero Apply CTA pulse (the recommended action) ────────
+    tl.to("#apply-1", {
+      keyframes: [
+        { scale: 1.05, duration: 0.20, ease: m.springLively },
+        { scale: 1.00, duration: 0.26, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+    }, 6.20);
+
+    // ─── 7.50s — Final camera push (settled) ──────────────────────────
+    tl.to(".content", {
+      scale: 1.012, duration: m.camera, ease: m.smoothInOut, transformOrigin: "50% 50%",
+    }, 7.50);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["recommended-jobs"] = tl;
+  </script>
+</body>
+</html>

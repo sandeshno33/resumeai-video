@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — ATS Optimizer</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="/compositions/motion.js"></script>
+  <style>
+    .page-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .page-title { display: flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 300; letter-spacing: -0.64px; color: var(--heading); }
+    .page-title .icon { color: var(--heading); }
+    .page-desc { font-size: 16px; color: var(--body); max-width: 720px; line-height: 1.5; }
+
+    .ats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    .input-card { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); box-shadow: var(--shadow-ambient); }
+    .input-card-label { font-size: 13px; color: var(--body); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; }
+    .textarea {
+      width: 100%; min-height: 320px;
+      border: 1px solid var(--border); border-radius: var(--r-relaxed);
+      padding: 16px; font-family: inherit; font-size: 14px; color: var(--label);
+      background: var(--surface);
+      resize: none; line-height: 1.55;
+      font-feature-settings: "ss01" on;
+    }
+    .textarea-mock { color: var(--label); white-space: pre-wrap; }
+    .input-actions { display: flex; gap: 12px; margin-top: 16px; }
+    .input-actions .btn { flex: 1; justify-content: center; }
+
+    .score-card { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); box-shadow: var(--shadow-elevated); }
+    .score-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .score-head-title { font-size: 22px; font-weight: 300; letter-spacing: -0.22px; color: var(--heading); }
+    .score-head-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .score-head-meta .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--label); font-weight: 500; }
+    .score-head-meta .val { font-size: 40px; font-weight: 300; letter-spacing: -0.8px; color: var(--heading); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+    .score-head-meta .val .out { color: var(--body); font-size: 22px; }
+
+    .gauge-wrap { display: flex; justify-content: center; padding: 8px 0 16px; }
+    .gauge-svg { width: 240px; height: 140px; }
+
+    .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
+    .kw-section-head { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 13px; font-weight: 400; }
+    .kw-section-head.matched { color: var(--success-text); }
+    .kw-section-head.missing { color: var(--ruby-text); }
+    .kw-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .kw-extra { padding: 2px 8px; font-size: 12px; color: var(--body); }
+
+    .reopt { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .reopt .btn { width: 100%; justify-content: center; }
+    .reopt-hint { margin-top: 8px; text-align: center; font-size: 12px; color: var(--body); }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="ats-optimizer" data-width="1920" data-height="1080" data-duration="12">
+    <aside class="sidebar" data-active="ats-optimizer"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <div class="page-head" id="page-head">
+          <h1 class="page-title" id="page-title"><span data-icon="target" data-icon-size="28"></span> ATS Optimizer</h1>
+          <p class="page-desc" id="page-desc">Perfect your resume for any role. Paste a job description to analyze how well your resume matches and get AI-driven improvements to boost your ATS score.</p>
+        </div>
+
+        <div class="ats-grid">
+
+          <!-- LEFT: Job description input -->
+          <div class="input-card" id="left-card">
+            <div class="input-card-label" id="left-label">Job description</div>
+            <div class="textarea textarea-mock" id="desc-text">Senior Full-Stack Engineer — Acme Cloud
+San Francisco, CA · Remote OK · Full-time
+
+We're hiring a senior engineer to lead the development of our distributed event platform. You'll partner with product and design to ship features end-to-end across web, mobile, and infrastructure.
+
+What you'll do
+• Design and implement scalable services in TypeScript and Go.
+• Own the React-based dashboard end-to-end, including GraphQL APIs.
+• Operate production workloads on AWS (EKS, RDS, S3) with Terraform.
+• Mentor mid-level engineers and contribute to technical direction.
+
+What we're looking for
+• 5+ years building production web apps with React + TypeScript.
+• Strong backend experience with Node.js or Go.
+• Comfort with Kubernetes, Docker, Kafka, and Redis at scale.
+• Bonus: gRPC, PostgreSQL tuning, observability.</div>
+            <div class="input-actions">
+              <button class="btn btn-ghost" id="check-btn">Check Score</button>
+              <button class="btn btn-primary" id="opt-btn">Optimize Resume</button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Score results -->
+          <div class="score-card" id="right-card">
+            <div class="score-head">
+              <h2 class="score-head-title" id="score-title">Your ATS Score</h2>
+              <div class="score-head-meta">
+                <span class="lbl">ATS Score</span>
+                <span class="val"><span id="score-num">89</span><span class="out">/100</span></span>
+              </div>
+            </div>
+
+            <!-- Gauge -->
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" viewBox="0 0 240 140">
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#ea2261"/>
+                    <stop offset="40%" stop-color="#9b6829"/>
+                    <stop offset="100%" stop-color="#15be53"/>
+                  </linearGradient>
+                </defs>
+                <!-- Track -->
+                <path d="M 20 120 A 100 100 0 0 1 220 120"
+                      fill="none" stroke="#eff1fd" stroke-width="14" stroke-linecap="round"/>
+                <!-- Filled arc — animates dashoffset from 314 (empty) to 34.5 (89%) -->
+                <path id="gauge-fill" d="M 20 120 A 100 100 0 0 1 220 120"
+                      fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round"
+                      stroke-dasharray="314" stroke-dashoffset="34.5"/>
+                <!-- Needle — outer translate sets pivot, inner group rotates around 0,0 -->
+                <g id="gauge-needle">
+                  <line x1="120" y1="120" x2="120" y2="30" stroke="#061b31" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="120" cy="120" r="8" fill="#061b31"/>
+                </g>
+                <text x="20" y="138" font-size="11" font-family="Inter" fill="#64748d">0</text>
+                <text x="116" y="20" font-size="11" font-family="Inter" fill="#64748d">50</text>
+                <text x="216" y="138" font-size="11" font-family="Inter" fill="#64748d">100</text>
+              </svg>
+            </div>
+
+            <div class="kw-grid">
+              <div id="matched-block">
+                <div class="kw-section-head matched">
+                  <span data-icon="check" data-icon-size="16"></span>
+                  Matched (<span id="matched-count">12</span>)
+                </div>
+                <div class="kw-list" id="matched-pills">
+                  <span class="badge badge-success kw-matched">React</span>
+                  <span class="badge badge-success kw-matched">TypeScript</span>
+                  <span class="badge badge-success kw-matched">GraphQL</span>
+                  <span class="badge badge-success kw-matched">AWS</span>
+                  <span class="badge badge-success kw-matched">Docker</span>
+                  <span class="badge badge-success kw-matched">Node.js</span>
+                  <span class="badge badge-success kw-matched">REST APIs</span>
+                  <span class="badge badge-success kw-matched">PostgreSQL</span>
+                  <span class="kw-extra">+4</span>
+                </div>
+              </div>
+              <div id="missing-block">
+                <div class="kw-section-head missing">
+                  <span data-icon="x" data-icon-size="16"></span>
+                  Missing (<span id="missing-count">5</span>)
+                </div>
+                <div class="kw-list" id="missing-pills">
+                  <span class="badge badge-warning kw-missing">Kubernetes</span>
+                  <span class="badge badge-warning kw-missing">Terraform</span>
+                  <span class="badge badge-warning kw-missing">Kafka</span>
+                  <span class="badge badge-warning kw-missing">Redis</span>
+                  <span class="badge badge-warning kw-missing">gRPC</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="reopt" id="reopt-block">
+              <button class="btn btn-primary" id="reopt-btn">Re-optimize Resume</button>
+              <div class="reopt-hint">AI will add missing keywords and improve your content</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    document.querySelectorAll("[data-icon]").forEach(function (el) {
+      const name = el.dataset.icon;
+      const size = el.dataset.iconSize || "16";
+      el.innerHTML = window.__rai.svg(name, size);
+    });
+    const cb = document.getElementById("check-btn");
+    if (cb) cb.innerHTML = window.__rai.svg("target", 16) + cb.innerHTML;
+    const ob = document.getElementById("opt-btn");
+    if (ob) ob.innerHTML = window.__rai.svg("zap", 16) + ob.innerHTML;
+    const rb = document.getElementById("reopt-btn");
+    if (rb) rb.innerHTML = window.__rai.svg("zap", 16) + rb.innerHTML;
+
+    // ─── Scene 5: ATS Optimizer (12s) — Apple-grade choreography ─────
+    const m = window.__motion;
+
+    // Set counter text initial states (before timeline construction)
+    document.getElementById("score-num").textContent = "0";
+    document.getElementById("matched-count").textContent = "0";
+    document.getElementById("missing-count").textContent = "0";
+
+    const tl = gsap.timeline({ paused: true });
+
+    // ─── 0.00s — Initial state (everything hidden / pre-animated) ───
+    tl.set("#page-title",   { opacity: 0, y: 16 }, 0);
+    tl.set("#page-desc",    { opacity: 0, y: 12 }, 0);
+    tl.set("#left-card",    { opacity: 0, y: 24, scale: 0.96, transformOrigin: "50% 0%" }, 0);
+    tl.set("#left-label",   { opacity: 0, x: -8 }, 0);
+    tl.set("#desc-text",    { clipPath: "inset(0% 0% 100% 0%)", webkitClipPath: "inset(0% 0% 100% 0%)" }, 0);
+    tl.set("#right-card",   { opacity: 0, x: 50 }, 0);
+    tl.set("#score-title",  { opacity: 0, y: 10 }, 0);
+    tl.set("#gauge-needle", { rotation: -90, svgOrigin: "120 120" }, 0);
+    tl.set("#gauge-fill",   { attr: { "stroke-dashoffset": 314 } }, 0);
+    tl.set(".kw-matched",   { opacity: 0, scale: 0.8, transformOrigin: "50% 50%" }, 0);
+    tl.set(".kw-missing",   { opacity: 0, scale: 0.8, transformOrigin: "50% 50%" }, 0);
+    tl.set(".kw-extra",     { opacity: 0 }, 0);
+    tl.set("#reopt-block",  { opacity: 0, y: 12 }, 0);
+
+    // ─── 0.30s — Page header reveal ──────────────────────────────────
+    tl.to("#page-title", { opacity: 1, y: 0, duration: m.ui, ease: m.smoothOut }, 0.30);
+    tl.to("#page-desc",  { opacity: 1, y: 0, duration: m.ui, ease: m.smoothOut }, 0.42);
+
+    // ─── 1.10s — Left card enters ────────────────────────────────────
+    tl.to("#left-card",  { opacity: 1, y: 0, scale: 1, duration: m.uiSlow, ease: m.springBrisk }, 1.10);
+    tl.to("#left-label", { opacity: 1, x: 0, duration: m.ui, ease: m.smoothOut }, 1.30);
+
+    // ─── 1.40s — Job description "types in" via clip-path mask ───────
+    tl.to("#desc-text", {
+      clipPath: "inset(0% 0% 0% 0%)",
+      webkitClipPath: "inset(0% 0% 0% 0%)",
+      duration: 1.4,
+      ease: m.smoothInOut,
+    }, 1.40);
+
+    // ─── 3.20s — Right card slides in from right ─────────────────────
+    tl.to("#right-card",  { opacity: 1, x: 0, duration: m.uiSlow, ease: m.springBrisk }, 3.20);
+    tl.to("#score-title", { opacity: 1, y: 0, duration: m.ui, ease: m.smoothOut }, 3.40);
+
+    // ─── 3.85s — Gauge sweep (needle + arc fill) + counter ───────────
+    tl.to("#gauge-needle", { rotation: 70, duration: m.counterSlow, ease: m.settle }, 3.85);
+    tl.to("#gauge-fill",   { attr: { "stroke-dashoffset": 34.5 }, duration: m.counterSlow, ease: m.settle }, 3.85);
+
+    const scoreObj = { v: 0 };
+    const scoreEl = document.getElementById("score-num");
+    tl.to(scoreObj, {
+      v: 89, duration: 1.20, ease: m.settle,
+      onUpdate: function () { scoreEl.textContent = String(Math.round(scoreObj.v)); },
+    }, 3.85);
+
+    // ─── 5.40s — Score number flash (the "you scored!" moment) ───────
+    tl.to("#score-num", {
+      keyframes: [
+        { scale: 1.10, duration: 0.18, ease: m.springLively },
+        { scale: 1.00, duration: 0.22, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+    }, 5.40);
+
+    // ─── 5.80s — Matched count + pills appear (stagger) ──────────────
+    const matchObj = { v: 0 };
+    const matchEl = document.getElementById("matched-count");
+    tl.to(matchObj, {
+      v: 12, duration: 0.50, ease: m.settle,
+      onUpdate: function () { matchEl.textContent = String(Math.round(matchObj.v)); },
+    }, 5.80);
+    tl.to(".kw-matched", {
+      opacity: 1, scale: 1,
+      duration: m.micro, ease: m.springLively,
+      stagger: m.staggerFast,
+    }, 5.80);
+    tl.to(".kw-extra", { opacity: 1, duration: 0.30, ease: m.smoothOut }, 6.30);
+
+    // ─── 6.80s — Missing count + pills appear ────────────────────────
+    const missObj = { v: 0 };
+    const missEl = document.getElementById("missing-count");
+    tl.to(missObj, {
+      v: 5, duration: 0.30, ease: m.settle,
+      onUpdate: function () { missEl.textContent = String(Math.round(missObj.v)); },
+    }, 6.80);
+    tl.to(".kw-missing", {
+      opacity: 1, scale: 1,
+      duration: m.micro, ease: m.springLively,
+      stagger: 0.06,
+    }, 6.80);
+
+    // ─── 8.00s — TRANSFORMATION: missing → matched (the AI-fix moment)
+    // Color shift + scale pulse in one staggered tween.
+    tl.to(".kw-missing", {
+      keyframes: [
+        {
+          backgroundColor: "rgba(21, 190, 83, 0.20)",
+          color: "#0d7a35",
+          borderColor: "rgba(21, 190, 83, 0.40)",
+          scale: 1.14,
+          duration: 0.20,
+          ease: m.springLively,
+        },
+        { scale: 1.00, duration: 0.24, ease: m.smoothOut },
+      ],
+      stagger: 0.10,
+      transformOrigin: "50% 50%",
+    }, 8.00);
+
+    // Counts swap: missing → 0, matched → 17
+    tl.to(missObj, {
+      v: 0, duration: 0.6, ease: m.smoothOut,
+      onUpdate: function () { missEl.textContent = String(Math.round(missObj.v)); },
+    }, 8.40);
+    tl.to(matchObj, {
+      v: 17, duration: 0.6, ease: m.smoothOut,
+      onUpdate: function () { matchEl.textContent = String(Math.round(matchObj.v)); },
+    }, 8.40);
+
+    // ─── 9.50s — Score climbs further (89 → 96) + gauge follows ──────
+    tl.to(scoreObj, {
+      v: 96, duration: 0.7, ease: m.settle,
+      onUpdate: function () { scoreEl.textContent = String(Math.round(scoreObj.v)); },
+    }, 9.50);
+    tl.to("#gauge-needle", { rotation: 86, duration: 0.7, ease: m.settle }, 9.50);
+    tl.to("#gauge-fill",   { attr: { "stroke-dashoffset": 12.5 }, duration: 0.7, ease: m.settle }, 9.50);
+
+    // Score flash on the new value
+    tl.to("#score-num", {
+      keyframes: [
+        { scale: 1.12, duration: 0.18, ease: m.springLively },
+        { scale: 1.00, duration: 0.22, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+    }, 10.20);
+
+    // ─── 10.40s — Re-optimize block fades in (now actionable) ───────
+    tl.to("#reopt-block", { opacity: 1, y: 0, duration: m.ui, ease: m.smoothOut }, 10.40);
+
+    // ─── 10.80s — Re-optimize button pulse (CTA emphasis) ────────────
+    tl.to("#reopt-btn", {
+      keyframes: [
+        { scale: 1.04, duration: 0.20, ease: m.springLively },
+        { scale: 1.00, duration: 0.30, ease: m.smoothOut },
+      ],
+      transformOrigin: "50% 50%",
+    }, 10.80);
+
+    // ─── 11.00s — Final camera push (Apple "we're settled" beat) ────
+    tl.to(".content", {
+      scale: 1.015, duration: 1.00, ease: m.smoothInOut,
+      transformOrigin: "50% 50%",
+    }, 11.00);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["ats-optimizer"] = tl;
+
+    // ─── Preview behavior ────────────────────────────────────────────
+    // - HyperFrames: timeline is scrubbed by the engine — leave paused
+    // - Inside iframe (gallery static preview): jump to end state
+    // - Direct browser open: autoplay so user sees the animation
+    if (!window.__hyperframes) {
+      if (window.self !== window.top) {
+        // Iframed → show end state for static preview
+        tl.progress(1).pause();
+      } else {
+        // Direct view → autoplay
+        setTimeout(function () { tl.play(); }, 300);
+      }
+    }
+  </script>
+</body>
+</html>

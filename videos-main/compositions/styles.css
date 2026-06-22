@@ -1,0 +1,282 @@
+/* Resume AI — shared styles for all dashboard mockups.
+   Mirrors cv-ai-frontend Stripe-inspired design system.
+   Inter substitutes for sohne-var (custom font, not bundled). */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+:root {
+  --surface: #ffffff;
+  --surface-soft: #f6f9fc;
+  --heading: #061b31;
+  --label: #273951;
+  --body: #64748d;
+  --primary: #533afd;
+  --primary-hover: #4434d4;
+  --primary-deep: #2e2b8c;
+  --primary-light: #b9b9f9;
+  --primary-tint-5: rgba(83, 58, 253, 0.05);
+  --primary-tint-8: rgba(83, 58, 253, 0.08);
+  --border: #e5edf5;
+  --border-soft: #d6d9fc;
+  --tint-30: #f3f5fe;
+  --tint-40: #eff1fd;
+  --tint-50: #ebedfc;
+  --border-dashed: #362baa;
+  --success: #15be53;
+  --success-text: #0d7a35;
+  --success-bg: rgba(21, 190, 83, 0.20);
+  --success-border: rgba(21, 190, 83, 0.40);
+  --ruby: #ea2261;
+  --ruby-text: #c41a4f;
+  --magenta: #f96bee;
+  --magenta-light: #ffd7ef;
+  --lemon: #9b6829;
+  --warning-text: #7a4f1c;
+  --warning-bg: rgba(155, 104, 41, 0.12);
+  --warning-border: rgba(155, 104, 41, 0.30);
+  --info-text: #1a5e94;
+  --brand-dark: #1c1e54;
+
+  --r-micro: 1px;
+  --r-standard: 4px;
+  --r-comfort: 5px;
+  --r-relaxed: 6px;
+  --r-large: 8px;
+
+  --shadow-ambient: rgba(23, 23, 23, 0.06) 0px 3px 6px;
+  --shadow-standard: rgba(23, 23, 23, 0.08) 0px 15px 35px 0px;
+  --shadow-elevated: rgba(50, 50, 93, 0.25) 0px 30px 45px -30px, rgba(0, 0, 0, 0.10) 0px 18px 36px -18px;
+  --shadow-deep: rgba(3, 3, 39, 0.25) 0px 14px 21px -14px, rgba(0, 0, 0, 0.10) 0px 8px 17px -8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--surface);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 300;
+  color: var(--heading);
+  font-feature-settings: "ss01" on;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+/* ─── App shell ─────────────────────────────────────────────── */
+.app {
+  display: flex;
+  width: 1920px;
+  height: 1080px;
+}
+
+/* ─── Sidebar ───────────────────────────────────────────────── */
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 4px;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 12px 24px 12px;
+}
+.sidebar-brand-logo {
+  width: 160px;
+  height: 36px;
+  object-fit: contain;
+  object-position: left center;
+}
+.sidebar-section-label {
+  padding: 16px 12px 8px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--body);
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: var(--r-relaxed);
+  color: var(--label);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.nav-item:hover { background: var(--tint-40); }
+.nav-item.active {
+  background: var(--primary-tint-8);
+  color: var(--primary);
+}
+.nav-item.active .icon { color: var(--primary); }
+.nav-item .icon { width: 18px; height: 18px; color: var(--body); flex-shrink: 0; }
+.nav-item.active .icon { color: var(--primary); }
+.sidebar-spacer { flex: 1; }
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd7ef, #b9b9f9);
+  color: var(--primary-deep);
+  display: grid;
+  place-items: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+.avatar-meta { display: flex; flex-direction: column; line-height: 1.2; }
+.avatar-name { font-size: 14px; color: var(--heading); font-weight: 400; }
+.avatar-email { font-size: 12px; color: var(--body); }
+
+/* ─── Main pane ─────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  overflow: hidden;
+}
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 32px 0 32px;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--body);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.content {
+  flex: 1;
+  overflow: hidden;
+  padding: 32px 48px 48px 48px;
+}
+
+/* ─── Card primitives ───────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-large);
+  box-shadow: var(--shadow-standard);
+}
+.card-flat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-relaxed);
+}
+
+/* ─── Buttons ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--r-standard);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  font-feature-settings: "ss01" on;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-ghost {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+.btn-ghost:hover { background: var(--primary-tint-5); }
+.btn-neutral {
+  background: transparent;
+  color: var(--label);
+  border-color: var(--border);
+}
+.btn-neutral:hover { background: var(--tint-40); }
+.btn-sm { padding: 8px 14px; font-size: 14px; }
+.btn-lg { padding: 12px 22px; font-size: 16px; }
+.btn .icon { width: 16px; height: 16px; }
+
+/* ─── Badges / pills ────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--r-standard);
+  font-size: 11px;
+  font-weight: 400;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--label);
+}
+.badge .icon { width: 11px; height: 11px; }
+.badge-success {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+.badge-warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-color: var(--warning-border);
+}
+.badge-primary {
+  background: var(--primary-tint-8);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+.badge-neutral {
+  background: var(--surface-soft);
+  color: var(--label);
+  border-color: var(--border);
+}
+
+/* ─── Typography helpers ────────────────────────────────────── */
+.h-display { font-size: 56px; font-weight: 300; line-height: 1.03; letter-spacing: -1.4px; color: var(--heading); }
+.h-large   { font-size: 48px; font-weight: 300; line-height: 1.15; letter-spacing: -0.96px; color: var(--heading); }
+.h-section { font-size: 32px; font-weight: 300; line-height: 1.10; letter-spacing: -0.64px; color: var(--heading); }
+.h-sub-lg  { font-size: 26px; font-weight: 300; line-height: 1.12; letter-spacing: -0.26px; color: var(--heading); }
+.h-sub     { font-size: 22px; font-weight: 300; line-height: 1.10; letter-spacing: -0.22px; color: var(--heading); }
+.t-body-lg { font-size: 18px; font-weight: 300; line-height: 1.40; color: var(--body); }
+.t-body    { font-size: 16px; font-weight: 300; line-height: 1.40; color: var(--body); }
+.t-label   { font-size: 14px; font-weight: 400; color: var(--label); }
+.t-caption { font-size: 13px; font-weight: 400; color: var(--body); }
+.t-caption-sm { font-size: 12px; font-weight: 400; color: var(--body); }
+.t-uppercase { text-transform: uppercase; letter-spacing: 0.6px; color: var(--label); font-size: 11px; font-weight: 500; }
+.tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+
+/* ─── Inline icon helper (Lucide-style) ─────────────────────── */
+.icon { display: inline-block; vertical-align: middle; }

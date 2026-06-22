@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — Resume Builder</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; gap: 24px; }
+    .page-head-text { display: flex; flex-direction: column; gap: 6px; }
+    .page-title { display: flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 300; letter-spacing: -0.64px; color: var(--heading); }
+    .page-desc { font-size: 16px; color: var(--body); max-width: 720px; line-height: 1.5; }
+    .page-head-actions { display: flex; gap: 8px; }
+
+    .section-title { font-size: 20px; font-weight: 400; color: var(--heading); margin: 0 0 12px 0; letter-spacing: -0.2px; }
+    .section-sub { font-size: 13px; color: var(--body); margin-bottom: 14px; }
+
+    /* Templates */
+    .templates-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 28px; }
+    .tpl { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); overflow: hidden; box-shadow: var(--shadow-ambient); display: flex; flex-direction: column; }
+    .tpl-thumb {
+      aspect-ratio: 8.5 / 11;
+      max-height: 240px;
+      padding: 14px 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    .tpl-meta { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .tpl-name { font-size: 13px; font-weight: 400; color: var(--heading); }
+    .tpl-tag { font-size: 11px; color: var(--body); }
+    .tpl.featured { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-tint-5), var(--shadow-ambient); }
+
+    /* Mini preview shapes */
+    .mp-name { width: 60%; height: 12px; background: #061b31; border-radius: 2px; margin-bottom: 4px; }
+    .mp-tag  { width: 80%; height: 6px; background: var(--body); border-radius: 2px; opacity: 0.5; margin-bottom: 12px; }
+    .mp-rule { width: 100%; height: 1px; background: var(--border); margin: 8px 0; }
+    .mp-h    { width: 25%; height: 6px; background: var(--primary); border-radius: 2px; margin: 10px 0 4px; }
+    .mp-line { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 3px; }
+    .mp-line.s { width: 70%; }
+    .mp-line.m { width: 90%; }
+
+    .tpl-modern { background: linear-gradient(180deg, #fff, #fafbff); }
+    .tpl-classic .mp-h { background: var(--heading); }
+    .tpl-bold { background: linear-gradient(120deg, #fff 50%, #ffd7ef 100%); }
+    .tpl-bold .mp-h { background: var(--ruby); }
+    .tpl-mono .mp-h { background: var(--lemon); border-radius: 0; }
+    .tpl-sidebar-l { padding: 0; display: flex; }
+    .tpl-sidebar-l .left { width: 40%; background: var(--brand-dark); padding: 14px 12px; }
+    .tpl-sidebar-l .left .mp-name { background: #fff; }
+    .tpl-sidebar-l .left .mp-tag { background: rgba(255,255,255,0.6); }
+    .tpl-sidebar-l .left .mp-line { background: rgba(255,255,255,0.4); }
+    .tpl-sidebar-l .right { flex: 1; padding: 14px 14px; }
+
+    /* Recent resumes table */
+    .recent-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); box-shadow: var(--shadow-standard); }
+    .recent-head { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .recent-title { font-size: 16px; font-weight: 400; color: var(--heading); }
+    .recent-toolbar { display: flex; align-items: center; gap: 8px; color: var(--body); font-size: 13px; }
+    .recent-search { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--r-standard); width: 240px; color: var(--body); font-size: 13px; }
+
+    table.recent { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.recent th, table.recent td { text-align: left; padding: 14px 20px; }
+    table.recent th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--body); font-weight: 500; background: var(--tint-30); border-bottom: 1px solid var(--border); }
+    table.recent tbody tr { border-bottom: 1px solid var(--border); }
+    table.recent tbody tr:last-child { border-bottom: none; }
+    .res-row { display: flex; align-items: center; gap: 12px; }
+    .res-mini { width: 28px; height: 36px; background: #fff; border: 1px solid var(--border); border-radius: 2px; display: flex; flex-direction: column; padding: 4px 3px; gap: 2px; flex-shrink: 0; }
+    .res-mini .l { height: 2px; width: 100%; background: var(--border); border-radius: 1px; }
+    .res-mini .l.h { background: var(--primary); }
+    .res-name { font-weight: 400; color: var(--heading); font-size: 14px; }
+    .res-sub { font-size: 12px; color: var(--body); margin-top: 1px; }
+    .ats { display: inline-flex; align-items: center; gap: 6px; }
+    .ats-bar { width: 64px; height: 4px; background: var(--tint-50); border-radius: 999px; overflow: hidden; }
+    .ats-bar > span { display: block; height: 100%; background: var(--success); }
+    .ats-num { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--label); }
+    .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="resumes" data-width="1920" data-height="1080">
+    <aside class="sidebar" data-active="resumes"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <div class="page-head">
+          <div class="page-head-text">
+            <h1 class="page-title"><span data-icon="file" data-icon-size="28"></span> Resume builder</h1>
+            <p class="page-desc">Start from a template, import a PDF, or branch any of your existing resumes for a new role. Every export is parsed back into a saved version.</p>
+          </div>
+          <div class="page-head-actions">
+            <button class="btn btn-neutral" id="imp">Import PDF</button>
+            <button class="btn btn-primary" id="new">New resume</button>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="section-title">Templates</h2>
+          <p class="section-sub">Start from a base — every template is ATS-safe and editable in the live editor.</p>
+          <div class="templates-row">
+
+            <div class="tpl featured tpl-modern">
+              <div class="tpl-thumb">
+                <div class="mp-name"></div>
+                <div class="mp-tag"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line m"></div><div class="mp-line"></div><div class="mp-line s"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line"></div><div class="mp-line m"></div><div class="mp-line s"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line m"></div><div class="mp-line"></div>
+              </div>
+              <div class="tpl-meta">
+                <span class="tpl-name">Modern</span>
+                <span class="tpl-tag">Recommended</span>
+              </div>
+            </div>
+
+            <div class="tpl tpl-classic">
+              <div class="tpl-thumb">
+                <div class="mp-name" style="margin: 0 auto 4px; width: 50%;"></div>
+                <div class="mp-tag" style="margin: 0 auto 12px; width: 70%;"></div>
+                <div class="mp-rule"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line m"></div><div class="mp-line"></div><div class="mp-line s"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line"></div><div class="mp-line m"></div><div class="mp-line s"></div>
+              </div>
+              <div class="tpl-meta">
+                <span class="tpl-name">Classic</span>
+                <span class="tpl-tag">ATS-friendly</span>
+              </div>
+            </div>
+
+            <div class="tpl tpl-sidebar-l">
+              <div class="tpl-thumb" style="display:flex; padding:0;">
+                <div class="left">
+                  <div class="mp-name" style="height:8px;"></div>
+                  <div class="mp-tag"></div>
+                  <div class="mp-line"></div><div class="mp-line m"></div><div class="mp-line s"></div>
+                  <div class="mp-line"></div><div class="mp-line s"></div>
+                </div>
+                <div class="right">
+                  <div class="mp-h"></div>
+                  <div class="mp-line m"></div><div class="mp-line"></div><div class="mp-line s"></div>
+                  <div class="mp-h"></div>
+                  <div class="mp-line"></div><div class="mp-line m"></div>
+                </div>
+              </div>
+              <div class="tpl-meta">
+                <span class="tpl-name">Sidebar</span>
+                <span class="tpl-tag">Two-column</span>
+              </div>
+            </div>
+
+            <div class="tpl tpl-bold">
+              <div class="tpl-thumb">
+                <div class="mp-name" style="background:var(--ruby);"></div>
+                <div class="mp-tag"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line m"></div><div class="mp-line"></div><div class="mp-line s"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line"></div><div class="mp-line m"></div>
+              </div>
+              <div class="tpl-meta">
+                <span class="tpl-name">Bold</span>
+                <span class="tpl-tag">Creative</span>
+              </div>
+            </div>
+
+            <div class="tpl tpl-mono">
+              <div class="tpl-thumb">
+                <div class="mp-name" style="background:var(--lemon); border-radius:0;"></div>
+                <div class="mp-tag"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line m"></div><div class="mp-line"></div><div class="mp-line s"></div>
+                <div class="mp-h"></div>
+                <div class="mp-line"></div><div class="mp-line m"></div><div class="mp-line s"></div>
+              </div>
+              <div class="tpl-meta">
+                <span class="tpl-name">Mono</span>
+                <span class="tpl-tag">Engineering</span>
+              </div>
+            </div>
+
+          </div>
+
+          <h2 class="section-title">My resumes</h2>
+          <div class="recent-card">
+            <div class="recent-head">
+              <div class="recent-title">12 resumes</div>
+              <div class="recent-toolbar">
+                <div class="recent-search"><span data-icon="search" data-icon-size="13"></span> Search by job or company</div>
+              </div>
+            </div>
+            <table class="recent">
+              <thead>
+                <tr>
+                  <th>Resume</th>
+                  <th>Tailored for</th>
+                  <th>ATS score</th>
+                  <th>Last edited</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="res-row"><div class="res-mini"><div class="l h"></div><div class="l"></div><div class="l"></div><div class="l h"></div><div class="l"></div></div><div><div class="res-name">Senior Full-Stack — Acme Cloud v3</div><div class="res-sub">Modern · 2 pages · 312 KB</div></div></div></td>
+                  <td><span class="badge badge-primary">Acme Cloud</span></td>
+                  <td><span class="ats"><span class="ats-bar"><span style="width:89%"></span></span><span class="ats-num">89</span></span></td>
+                  <td class="col-date" style="color:var(--body); font-variant-numeric:tabular-nums;">Today, 10:42</td>
+                  <td><div class="row-actions"><button class="btn btn-neutral btn-sm">Open</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="res-row"><div class="res-mini"><div class="l"></div><div class="l h"></div><div class="l"></div><div class="l"></div><div class="l h"></div></div><div><div class="res-name">Staff Platform Eng — Northwind v2</div><div class="res-sub">Classic · 2 pages · 298 KB</div></div></div></td>
+                  <td><span class="badge badge-primary">Northwind Labs</span></td>
+                  <td><span class="ats"><span class="ats-bar"><span style="width:91%"></span></span><span class="ats-num">91</span></span></td>
+                  <td style="color:var(--body); font-variant-numeric:tabular-nums;">Today, 10:38</td>
+                  <td><div class="row-actions"><button class="btn btn-neutral btn-sm">Open</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="res-row"><div class="res-mini"><div class="l h"></div><div class="l"></div><div class="l h"></div><div class="l"></div><div class="l"></div></div><div><div class="res-name">Senior Frontend — Lumen v4</div><div class="res-sub">Sidebar · 2 pages · 304 KB</div></div></div></td>
+                  <td><span class="badge badge-primary">Lumen &amp; Co</span></td>
+                  <td><span class="ats"><span class="ats-bar"><span style="width:84%"></span></span><span class="ats-num">84</span></span></td>
+                  <td style="color:var(--body); font-variant-numeric:tabular-nums;">Today, 10:35</td>
+                  <td><div class="row-actions"><button class="btn btn-neutral btn-sm">Open</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="res-row"><div class="res-mini"><div class="l"></div><div class="l"></div><div class="l h"></div><div class="l"></div><div class="l"></div></div><div><div class="res-name">Principal DevEx — Vector AI v1</div><div class="res-sub">Modern · 3 pages · 388 KB</div></div></div></td>
+                  <td><span class="badge badge-primary">Vector AI</span></td>
+                  <td><span class="ats"><span class="ats-bar"><span style="width:78%"></span></span><span class="ats-num">78</span></span></td>
+                  <td style="color:var(--body); font-variant-numeric:tabular-nums;">Today, 10:31</td>
+                  <td><div class="row-actions"><button class="btn btn-neutral btn-sm">Open</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="res-row"><div class="res-mini"><div class="l h"></div><div class="l"></div><div class="l"></div><div class="l"></div><div class="l h"></div></div><div><div class="res-name">Eng Manager Growth — Helio v2</div><div class="res-sub">Classic · 2 pages · 282 KB</div></div></div></td>
+                  <td><span class="badge badge-primary">Helio</span></td>
+                  <td><span class="ats"><span class="ats-bar"><span style="width:86%"></span></span><span class="ats-num">86</span></span></td>
+                  <td style="color:var(--body); font-variant-numeric:tabular-nums;">Yesterday</td>
+                  <td><div class="row-actions"><button class="btn btn-neutral btn-sm">Open</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="res-row"><div class="res-mini"><div class="l"></div><div class="l h"></div><div class="l"></div><div class="l h"></div><div class="l"></div></div><div><div class="res-name">Master CV — base profile</div><div class="res-sub">Modern · 4 pages · 412 KB</div></div></div></td>
+                  <td><span class="badge badge-neutral">Base</span></td>
+                  <td><span class="ats"><span class="ats-bar"><span style="width:82%"></span></span><span class="ats-num">82</span></span></td>
+                  <td style="color:var(--body); font-variant-numeric:tabular-nums;">May 8, 2026</td>
+                  <td><div class="row-actions"><button class="btn btn-neutral btn-sm">Open</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    document.querySelectorAll("[data-icon]").forEach(function (el) {
+      el.innerHTML = window.__rai.svg(el.dataset.icon, el.dataset.iconSize || "16");
+    });
+    const imp = document.getElementById("imp");
+    if (imp) imp.innerHTML = window.__rai.svg("upload", 16) + imp.innerHTML;
+    const nw = document.getElementById("new");
+    if (nw) nw.innerHTML = window.__rai.svg("plus", 16) + nw.innerHTML;
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["resumes"] = gsap.timeline({ paused: true });
+  </script>
+</body>
+</html>

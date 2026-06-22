@@ -71,6 +71,31 @@ export function useSceneOpacity(
   return Math.min(fadeIn, fadeOut);
 }
 
+// ── Scene transition helper for snappy slides & scale ────────────────────────
+export function useSceneTransition(
+  inFrame: number,
+  outFrame: number,
+  transitionDur = 8
+) {
+  const frame = useCurrentFrame();
+  const entryProgress = interpolate(frame, [inFrame, inFrame + transitionDur], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+  const exitProgress = interpolate(frame, [outFrame - transitionDur, outFrame], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.in(Easing.cubic),
+  });
+
+  const opacity = entryProgress * (1 - exitProgress);
+  const tx = interpolate(entryProgress, [0, 1], [300, 0]) + interpolate(exitProgress, [0, 1], [0, -300]);
+  const scale = interpolate(entryProgress, [0, 1], [0.96, 1]) * interpolate(exitProgress, [0, 1], [1, 0.96]);
+
+  return { opacity, tx, scale };
+}
+
 // ── Staggered children delay ──────────────────────────────────────────────────
 export function staggerDelay(index: number, stagger = 6): number {
   return index * stagger;

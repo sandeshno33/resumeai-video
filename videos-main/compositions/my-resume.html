@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — My Resume</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    .page-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .page-title { display: flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 300; letter-spacing: -0.64px; color: var(--heading); }
+    .page-desc { font-size: 16px; color: var(--body); max-width: 720px; line-height: 1.5; }
+
+    .layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+
+    /* Resume preview "paper" */
+    .preview-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); padding: 24px; box-shadow: var(--shadow-standard); }
+    .preview-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .preview-head-title { font-size: 18px; font-weight: 400; color: var(--heading); }
+    .preview-head-actions { display: flex; gap: 8px; }
+    .paper {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r-comfort);
+      padding: 56px 64px;
+      box-shadow: var(--shadow-elevated);
+      aspect-ratio: 8.5 / 11;
+      max-height: 720px;
+      overflow: hidden;
+    }
+    .pp-name { font-size: 30px; font-weight: 300; letter-spacing: -0.6px; color: var(--heading); }
+    .pp-headline { font-size: 14px; color: var(--body); margin-top: 4px; }
+    .pp-contact { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--body); }
+    .pp-rule { height: 1px; background: var(--border); margin: 18px 0; }
+    .pp-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--primary); font-weight: 500; margin-bottom: 8px; }
+    .pp-job { margin-bottom: 14px; }
+    .pp-job-row { display: flex; justify-content: space-between; align-items: baseline; }
+    .pp-job-title { font-size: 14px; font-weight: 500; color: var(--heading); }
+    .pp-job-when { font-size: 11px; color: var(--body); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+    .pp-job-co { font-size: 12px; color: var(--label); margin-top: 1px; }
+    .pp-bullet { display: flex; gap: 8px; font-size: 12px; color: var(--body); margin-top: 6px; line-height: 1.45; }
+    .pp-bullet::before { content: "•"; color: var(--primary); flex-shrink: 0; }
+    .pp-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pp-skill { padding: 2px 8px; background: var(--tint-50); border: 1px solid var(--border); border-radius: var(--r-standard); font-size: 11px; color: var(--label); }
+
+    /* Right column: meta + drop zone */
+    .meta-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-large); padding: 22px; box-shadow: var(--shadow-ambient); margin-bottom: 16px; }
+    .meta-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .meta-card-icon { width: 36px; height: 36px; border-radius: var(--r-standard); background: var(--primary-tint-8); color: var(--primary); display: grid; place-items: center; }
+    .meta-card-title { font-size: 16px; font-weight: 400; color: var(--heading); }
+    .meta-list { display: flex; flex-direction: column; gap: 10px; }
+    .meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .meta-row .lbl { color: var(--body); }
+    .meta-row .val { color: var(--label); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+
+    .drop-zone {
+      border: 1px dashed var(--border-dashed);
+      background: var(--primary-tint-5);
+      border-radius: var(--r-large);
+      padding: 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .drop-icon { width: 56px; height: 56px; border-radius: var(--r-large); background: var(--surface); border: 1px solid var(--primary-light); color: var(--primary); display: grid; place-items: center; box-shadow: var(--shadow-ambient); }
+    .drop-title { font-size: 17px; font-weight: 400; color: var(--heading); }
+    .drop-sub { font-size: 13px; color: var(--body); max-width: 360px; line-height: 1.5; }
+    .drop-actions { display: flex; gap: 8px; }
+
+    .score-strip { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-relaxed); margin-top: 16px; }
+    .score-strip-meta { display: flex; align-items: center; gap: 12px; }
+    .score-ring { width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--success) 0 86%, var(--tint-50) 86% 100%); display: grid; place-items: center; }
+    .score-ring::after { content: ""; width: 34px; height: 34px; border-radius: 50%; background: var(--surface); }
+    .score-ring-text { position: absolute; font-size: 13px; font-weight: 500; color: var(--heading); font-variant-numeric: tabular-nums; }
+    .score-ring-wrap { position: relative; display: grid; place-items: center; width: 44px; height: 44px; }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="my-resume" data-width="1920" data-height="1080">
+    <aside class="sidebar" data-active="my-resume"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <div class="page-head">
+          <h1 class="page-title"><span data-icon="upload" data-icon-size="28"></span> My resume</h1>
+          <p class="page-desc">Your primary CV — used by the ATS optimizer, recommended jobs, and the Chrome extension. Upload a PDF or build a new one in the editor.</p>
+        </div>
+
+        <div class="layout">
+
+          <!-- Preview -->
+          <div class="preview-card">
+            <div class="preview-head">
+              <div class="preview-head-title">alex-carter-resume.pdf</div>
+              <div class="preview-head-actions">
+                <button class="btn btn-neutral btn-sm" id="dl">Download</button>
+                <button class="btn btn-ghost btn-sm" id="ed">Edit in builder</button>
+                <button class="btn btn-primary btn-sm">Replace</button>
+              </div>
+            </div>
+            <div class="paper">
+              <div class="pp-name">Alex Carter</div>
+              <div class="pp-headline">Senior Full-Stack Engineer · Distributed systems · React, TypeScript, Go</div>
+              <div class="pp-contact">
+                <span>alex@example.com</span>
+                <span>+1 (415) 555-0143</span>
+                <span>San Francisco, CA</span>
+                <span>linkedin.com/in/alexcarter</span>
+              </div>
+              <div class="pp-rule"></div>
+
+              <div class="pp-section-title">Experience</div>
+              <div class="pp-job">
+                <div class="pp-job-row">
+                  <div class="pp-job-title">Senior Software Engineer</div>
+                  <div class="pp-job-when">Mar 2022 – Present</div>
+                </div>
+                <div class="pp-job-co">Northwind Labs · Remote</div>
+                <div class="pp-bullet">Led migration from Express to Go services, cutting p95 latency from 480ms to 92ms across the public API.</div>
+                <div class="pp-bullet">Owned the React-based merchant dashboard end-to-end, shipping ~40 features across 3 product areas.</div>
+                <div class="pp-bullet">Mentored 4 mid-level engineers; designed the team's RFC and on-call rotation processes.</div>
+              </div>
+              <div class="pp-job">
+                <div class="pp-job-row">
+                  <div class="pp-job-title">Software Engineer</div>
+                  <div class="pp-job-when">Jul 2019 – Feb 2022</div>
+                </div>
+                <div class="pp-job-co">Helio · Berlin, DE</div>
+                <div class="pp-bullet">Built the experimentation platform used by 80+ engineers across product and growth.</div>
+                <div class="pp-bullet">Drove SOC 2 Type II compliance for the data layer in partnership with security &amp; legal.</div>
+              </div>
+
+              <div class="pp-section-title">Skills</div>
+              <div class="pp-skills">
+                <span class="pp-skill">React</span>
+                <span class="pp-skill">TypeScript</span>
+                <span class="pp-skill">Go</span>
+                <span class="pp-skill">Node.js</span>
+                <span class="pp-skill">PostgreSQL</span>
+                <span class="pp-skill">GraphQL</span>
+                <span class="pp-skill">AWS</span>
+                <span class="pp-skill">Docker</span>
+                <span class="pp-skill">Kafka</span>
+                <span class="pp-skill">Terraform</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column -->
+          <div>
+            <div class="meta-card">
+              <div class="meta-card-head">
+                <div class="meta-card-icon" data-icon="file" data-icon-size="18"></div>
+                <div class="meta-card-title">File details</div>
+              </div>
+              <div class="meta-list">
+                <div class="meta-row"><span class="lbl">File</span><span class="val">alex-carter-resume.pdf</span></div>
+                <div class="meta-row"><span class="lbl">Size</span><span class="val">312 KB</span></div>
+                <div class="meta-row"><span class="lbl">Pages</span><span class="val">2</span></div>
+                <div class="meta-row"><span class="lbl">Uploaded</span><span class="val">May 12, 2026 · 14:08</span></div>
+                <div class="meta-row"><span class="lbl">Source</span><span class="val">Resume builder export</span></div>
+              </div>
+              <div class="score-strip">
+                <div class="score-strip-meta">
+                  <div class="score-ring-wrap">
+                    <div class="score-ring"></div>
+                    <span class="score-ring-text">86</span>
+                  </div>
+                  <div>
+                    <div style="font-size:13px; color:var(--label);">Average ATS score</div>
+                    <div style="font-size:11px; color:var(--body);">Across last 5 jobs</div>
+                  </div>
+                </div>
+                <button class="btn btn-ghost btn-sm" id="open-ats">Open optimizer</button>
+              </div>
+            </div>
+
+            <div class="drop-zone">
+              <div class="drop-icon" data-icon="upload" data-icon-size="24"></div>
+              <div class="drop-title">Replace your CV</div>
+              <div class="drop-sub">Drop a PDF anywhere on this page, or browse your computer. Max 10MB. We'll re-parse it and re-score against your saved jobs automatically.</div>
+              <div class="drop-actions">
+                <button class="btn btn-primary" id="up">Browse files</button>
+                <button class="btn btn-ghost" id="bld">Open resume builder</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    document.querySelectorAll("[data-icon]").forEach(function (el) {
+      el.innerHTML = window.__rai.svg(el.dataset.icon, el.dataset.iconSize || "16");
+    });
+    const dl = document.getElementById("dl");
+    if (dl) dl.innerHTML = window.__rai.svg("download", 14) + dl.innerHTML;
+    const ed = document.getElementById("ed");
+    if (ed) ed.innerHTML = window.__rai.svg("file", 14) + ed.innerHTML;
+    const oa = document.getElementById("open-ats");
+    if (oa) oa.innerHTML = window.__rai.svg("target", 14) + oa.innerHTML;
+    const up = document.getElementById("up");
+    if (up) up.innerHTML = window.__rai.svg("upload", 16) + up.innerHTML;
+    const bld = document.getElementById("bld");
+    if (bld) bld.innerHTML = window.__rai.svg("sparkles", 16) + bld.innerHTML;
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["my-resume"] = gsap.timeline({ paused: true });
+  </script>
+</body>
+</html>

@@ -141,3 +141,54 @@ export const COMPOSITIONS = {
   portrait:  { id: "ResumeAI-9x16", width: 1080, height: 1920, label: "9:16 — Shorts / Stories" },
   square:    { id: "ResumeAI-1x1",  width: 1080, height: 1080, label: "1:1 — Feed / Discovery" },
 };
+
+// ── NEW CONFIGS FOR NEPALI VO (37.52s) ─────────────────────────────────────────
+export const DURATION_SEC_NEW = 37.52;
+export const TOTAL_FRAMES_NEW = Math.ceil(FPS * DURATION_SEC_NEW); // 1126 frames
+
+export const TIMING_NEW = {
+  FADE_IN:   8,
+  FADE_OUT:  8,
+  SLIDE_DUR: 6,
+
+  SCENE_HOOK:     0,    // 0s to 11.0s (329 frames)
+  SCENE_FLEX:     329,  // 11.0s to 716 (12.9s)
+  SCENE_STATS:    716,  // 23.9s to 960 (8.1s)
+  SCENE_CTA:      960,  // 32.0s to 1126 (5.5s)
+};
+
+export const COPY_NEW = {
+  hook: {
+    main: "Struggling to find a perfect job on LinkedIn?",
+    sub:  "Isn't there an easier shortcut?",
+  },
+  flex: {
+    atsLabel: "ATS OPTIMIZER",
+    atsTitle: "Boost your resume to the next level",
+    atsSub:   "Fix missing keywords automatically.",
+    extLabel: "CHROME EXTENSION",
+    extTitle: "Autofills & applies on LinkedIn",
+    extSub:   "Even while you sleep!",
+    boardLabel: "APPLICATION TRACKER",
+    boardTitle: "Instantly tracked in your dashboard",
+    boardSub:   "Watch the auto-apply bot build your pipeline.",
+  },
+  stats: {
+    title: "Real Results, Pure Efficiency",
+    applications: "Applications / week",
+    interviews: "Interviews / month",
+    hoursLost: "Hours lost",
+  },
+  cta: {
+    title: "Resume AI",
+    sub: "Build smarter. Get hired faster.",
+    btn: "Try Free at cvai.dev",
+  }
+};
+
+export const COMPOSITIONS_NEW = {
+  landscape: { id: "ResumeAI-Nepali-16x9", width: 1920, height: 1080, label: "16:9 — Nepali VO (English Text)" },
+  portrait:  { id: "ResumeAI-Nepali-9x16", width: 1080, height: 1920, label: "9:16 — Nepali VO (English Text)" },
+  square:    { id: "ResumeAI-Nepali-1x1",  width: 1080, height: 1080, label: "1:1 — Nepali VO (English Text)" },
+};
+

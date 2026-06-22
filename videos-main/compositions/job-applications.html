@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Resume AI — Job Applications Board</title>
+  <link rel="stylesheet" href="/compositions/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="/compositions/motion.js"></script>
+  <style>
+    /* All selectors kb- prefixed — sub-comps share one document. */
+    .kb-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+    .kb-page-title { font-size: 32px; font-weight: 300; letter-spacing: -0.64px; color: var(--heading); }
+    .kb-page-desc { margin-top: 6px; font-size: 15px; color: var(--body); max-width: 760px; line-height: 1.5; }
+    .kb-refresh { flex-shrink: 0; }
+
+    .kb-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .kb-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--tint-40); border-radius: var(--r-relaxed); }
+    .kb-seg-tab { padding: 7px 16px; border-radius: var(--r-comfort); font-size: 14px; font-weight: 400; color: var(--body); }
+    .kb-seg-tab.active { background: var(--surface); color: var(--heading); box-shadow: var(--shadow-ambient); }
+    .kb-toolbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .kb-board { display: flex; gap: 16px; }
+    .kb-col { position: relative; width: 244px; flex-shrink: 0; display: flex; flex-direction: column; }
+    .kb-col-head { display: flex; align-items: center; gap: 8px; padding: 0 4px; margin-bottom: 8px; }
+    .kb-col-label { font-size: 12px; font-weight: 500; color: var(--label); }
+    .kb-count { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+    .kb-track {
+      display: flex; flex-direction: column; gap: 8px;
+      height: 700px; padding: 8px;
+      border: 1px solid var(--border); border-radius: var(--r-relaxed);
+      background: var(--surface-soft);
+    }
+
+    .kb-card {
+      position: relative;
+      height: 152px; overflow: hidden; flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 7px;
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--r-comfort);
+    }
+    .kb-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .kb-card-title { font-size: 14px; font-weight: 500; line-height: 1.25; color: var(--heading); }
+    .kb-match { flex-shrink: 0; transform-origin: 50% 50%; }
+    .kb-card-co { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--body); }
+    .kb-logo {
+      width: 16px; height: 16px; border-radius: var(--r-micro); flex-shrink: 0;
+      background: var(--tint-50); border: 1px solid var(--border); color: var(--label);
+      display: grid; place-items: center; font-size: 8px; font-weight: 500;
+    }
+    .kb-card-loc { font-size: 12px; color: var(--body); }
+    .kb-card-sal { font-size: 12px; color: var(--label); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" on; }
+    .kb-card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .kb-stars { display: flex; gap: 2px; }
+    .kb-star { width: 12px; height: 12px; }
+    .kb-star.on { color: var(--primary); }
+    .kb-star.off { color: var(--border-soft); }
+    .kb-src { transform-origin: 50% 50%; }
+  </style>
+</head>
+<body>
+  <div class="app" data-composition-id="job-applications" data-start="0" data-duration="8" data-width="1920" data-height="1080">
+    <aside class="sidebar" data-active="job-applications"></aside>
+    <main class="main">
+      <div class="tabs" data-active="candidate"></div>
+      <div class="content">
+
+        <div class="kb-page-head">
+          <div>
+            <h1 class="kb-page-title" id="kb-title">Job Applications</h1>
+            <p class="kb-page-desc" id="kb-desc">Track every application through stages on your board, and review what the auto-apply bot submitted on your behalf.</p>
+          </div>
+          <div class="btn btn-neutral btn-sm kb-refresh" id="kb-refresh">
+            <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            Refresh
+          </div>
+        </div>
+
+        <div class="kb-toolbar" id="kb-toolbar">
+          <div class="kb-seg">
+            <div class="kb-seg-tab active">Board</div>
+            <div class="kb-seg-tab">Auto-apply activity</div>
+          </div>
+          <div class="kb-toolbar-right">
+            <span class="badge badge-success" id="kb-ext-badge">Extension active</span>
+            <div class="btn btn-primary btn-sm" id="kb-add" data-icon="plus" data-icon-size="15"></div>
+          </div>
+        </div>
+
+        <div class="kb-board" id="kb-board"></div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/compositions/chrome.js"></script>
+  <script>
+    // ─── Build the board from data (snapshot-first card fields: title,
+    //     match %, company+logo, location, salary, excitement, source) ──
+    var STAR_ON  = '<svg class="kb-star on" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    var STAR_OFF = '<svg class="kb-star off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+    function cardHTML(c) {
+      var html = '<div class="kb-card' + (c.cls ? " " + c.cls : "") + '"' + (c.id ? ' id="' + c.id + '"' : "") + '>';
+      html += '<div class="kb-card-top"><div class="kb-card-title">' + c.title + '</div>';
+      if (c.match) html += '<span class="badge badge-primary kb-match tabular">' + c.match + '% match</span>';
+      html += '</div>';
+      html += '<div class="kb-card-co"><span class="kb-logo">' + c.logo + '</span>' + c.co + '</div>';
+      html += '<div class="kb-card-loc">' + c.loc + '</div>';
+      if (c.sal) html += '<div class="kb-card-sal">' + c.sal + '</div>';
+      html += '<div class="kb-card-foot"><span class="kb-stars">';
+      if (c.stars) for (var i = 0; i < 5; i++) html += i < c.stars ? STAR_ON : STAR_OFF;
+      html += '</span><span class="badge badge-neutral kb-src">' + c.src + '</span></div>';
+      html += '</div>';
+      return html;
+    }
+
+    var COLUMNS = [
+      { key: "saved", label: "Saved", count: 2, cards: [
+        { title: "Senior Frontend Engineer", logo: "LC", co: "Lumen &amp; Co", loc: "London, UK", match: 86, src: "Recommended" },
+        { title: "Engineering Manager, Growth", logo: "HE", co: "Helio", loc: "Berlin, DE", src: "Manual" },
+      ]},
+      { key: "applied", label: "Applied", count: 3, cards: [
+        { id: "kb-drag", title: "Senior Full-Stack Engineer", logo: "AC", co: "Acme Cloud", loc: "San Francisco, CA · Remote", match: 94, sal: "$180K – $220K", stars: 5, src: "Extension" },
+        { cls: "kb-shift", title: "Staff Software Engineer", logo: "NL", co: "Northwind Labs", loc: "Remote — US", match: 91, src: "Extension" },
+        { cls: "kb-shift", title: "Senior Backend Engineer", logo: "SF", co: "Strand Financial", loc: "Singapore", match: 88, src: "Extension" },
+        { id: "kb-incoming", cls: "kb-shift", title: "Senior SRE, Observability", logo: "PV", co: "Pivot", loc: "Toronto, CA · Hybrid", match: 87, src: "Extension" },
+      ]},
+      { key: "interviewing", label: "Interviewing", count: 2, cards: [
+        { title: "Principal Engineer, DevEx", logo: "VA", co: "Vector AI", loc: "New York, NY", match: 92, stars: 4, src: "Extension" },
+        { title: "Lead Engineer, Infrastructure", logo: "QU", co: "Quanta Robotics", loc: "Remote — EU", match: 89, src: "Recommended" },
+      ]},
+      { key: "offer", label: "Offer", count: 1, cards: [
+        { title: "Senior Software Engineer", logo: "ND", co: "Nimbus Data", loc: "Austin, TX", match: 95, sal: "$190K – $230K", stars: 5, src: "Extension" },
+      ]},
+      { key: "accepted", label: "Accepted", count: 1, cards: [
+        { title: "Senior Platform Engineer", logo: "BL", co: "Brightline", loc: "Remote — US", match: 97, stars: 5, src: "Extension" },
+      ]},
+      { key: "rejected", label: "Rejected", count: 1, cards: [
+        { title: "Frontend Engineer", logo: "VM", co: "Vertex Media", loc: "Chicago, IL", match: 74, src: "Manual" },
+      ]},
+    ];
+
+    var boardHTML = "";
+    COLUMNS.forEach(function (col) {
+      boardHTML +=
+        '<div class="kb-col" data-col="' + col.key + '">' +
+          '<div class="kb-col-head">' +
+            '<span class="kb-col-label">' + col.label + '</span>' +
+            '<span class="badge badge-neutral kb-count" id="kb-count-' + col.key + '">' + col.count + '</span>' +
+          '</div>' +
+          '<div class="kb-track" id="kb-track-' + col.key + '">' +
+            col.cards.map(cardHTML).join("") +
+          '</div>' +
+        '</div>';
+    });
+    document.getElementById("kb-board").innerHTML = boardHTML;
+    document.getElementById("kb-add").innerHTML = window.__rai.svg("plus", 15) + " Add job";
+
+    // ─── Scene: Job Applications board (8s) ─────────────────────────────
+    // VO (40.0–46.3 abs / 0.3–6.6 local): "And the Chrome extension applies
+    // for you. On LinkedIn. With the right résumé. Even while you sleep."
+    // Story: extension-sourced cards STREAM into Applied while the VO says
+    // "applies for you"; a fresh card drops in ("even while you sleep");
+    // hero beat = the Acme card drags Applied → Interviewing — the pipeline
+    // moving forward on its own.
+    //
+    // Card geometry is FIXED (152px card / 8px gap / 260px column pitch) so
+    // the drag travel is compile-time arithmetic — no rect measurement that
+    // could vary with font-load timing across CI workers.
+    var m = window.__motion;
+    var CARD_H = 152, GAP = 8, COL_PITCH = 260;
+    var DRAG_DX = COL_PITCH;                 // Applied → Interviewing, 1 column right
+    var DRAG_DY = 2 * (CARD_H + GAP);        // lands below Interviewing's 2 cards
+    var SHIFT_UP = -(CARD_H + GAP);          // Applied gap-close after the card leaves
+
+    // Initial hidden states are LOAD-TIME sets — tl.set(..., 0) leaks the
+    // natural DOM over other scenes before this comp's first seek.
+    gsap.set("#kb-title",    { opacity: 0, y: 12 });
+    gsap.set("#kb-desc",     { clipPath: "inset(0 100% 0 0)", webkitClipPath: "inset(0 100% 0 0)" });
+    gsap.set("#kb-refresh",  { opacity: 0 });
+    gsap.set("#kb-toolbar",  { opacity: 0, y: 12 });
+    gsap.set("#kb-ext-badge",{ opacity: 0, scale: 0.85, transformOrigin: "50% 50%" });
+    gsap.set(".kb-col",      { opacity: 0, y: 18 });
+    gsap.set(".kb-card",     { opacity: 0, y: 14, scale: 0.97, transformOrigin: "50% 0%" });
+    gsap.set(".kb-count",    { opacity: 0, scale: 0.8, transformOrigin: "50% 50%" });
+    gsap.set("#kb-incoming", { opacity: 0, y: -24, scale: 0.95 });
+
+    var tl = gsap.timeline({ paused: true });
+
+    // ─── 0.20s — Page head ─────────────────────────────────────────────
+    tl.to("#kb-title", { opacity: 1, y: 0, duration: m.micro, ease: m.smoothOut }, 0.20);
+    tl.to("#kb-desc", {
+      clipPath: "inset(0 0% 0 0)", webkitClipPath: "inset(0 0% 0 0)",
+      duration: m.ui, ease: m.smoothInOut,
+    }, 0.40);
+    tl.to("#kb-refresh", { opacity: 1, duration: m.micro, ease: m.smoothOut }, 0.50);
+
+    // ─── 0.60s — Toolbar: Board/Activity tabs + Add job ────────────────
+    tl.to("#kb-toolbar", { opacity: 1, y: 0, duration: m.ui, ease: m.smoothOut }, 0.60);
+    tl.to("#kb-ext-badge", { opacity: 1, scale: 1, duration: m.micro, ease: m.springLively }, 0.85);
+
+    // ─── 0.85s — Columns rise (6) ───────────────────────────────────────
+    tl.to(".kb-col", { opacity: 1, y: 0, duration: m.ui, ease: m.springBrisk, stagger: 0.06 }, 0.85);
+
+    // ─── 1.30s — Cards cascade in; Applied streams first (VO: "applies
+    //             for you") and its Extension chips pop ─────────────────
+    var CARD_BEATS = [
+      { sel: "#kb-track-applied .kb-card:not(#kb-incoming)", at: 1.30, stagger: 0.12 },
+      { sel: "#kb-track-saved .kb-card",                     at: 1.55, stagger: 0.12 },
+      { sel: "#kb-track-interviewing .kb-card",              at: 1.75, stagger: 0.12 },
+      { sel: "#kb-track-offer .kb-card",                     at: 1.95 },
+      { sel: "#kb-track-accepted .kb-card",                  at: 2.05 },
+      { sel: "#kb-track-rejected .kb-card",                  at: 2.15 },
+    ];
+    CARD_BEATS.forEach(function (b) {
+      tl.to(b.sel, { opacity: 1, y: 0, scale: 1, duration: m.ui, ease: m.springBrisk, stagger: b.stagger || 0 }, b.at);
+    });
+    tl.to("#kb-track-applied .kb-src", {
+      keyframes: [
+        { scale: 1.15, duration: 0.16, ease: m.springLively },
+        { scale: 1.00, duration: 0.20, ease: m.smoothOut },
+      ],
+      stagger: 0.12,
+    }, 1.65);
+
+    // Count badges pop as each column's cards land
+    [["saved", 1.85], ["applied", 1.75], ["interviewing", 2.05],
+     ["offer", 2.15], ["accepted", 2.25], ["rejected", 2.35]].forEach(function (p) {
+      tl.to("#kb-count-" + p[0], { opacity: 1, scale: 1, duration: m.micro, ease: m.springLively }, p[1]);
+    });
+
+    // Count helper — obj tween so the text scrubs deterministically.
+    function countTo(key, from, to, at) {
+      var el = document.getElementById("kb-count-" + key);
+      var obj = { v: from };
+      tl.to(obj, {
+        v: to, duration: 0.20, ease: m.smoothOut,
+        onUpdate: function () { el.textContent = String(Math.round(obj.v)); },
+      }, at);
+      tl.to(el, {
+        keyframes: [
+          { scale: 1.18, duration: 0.16, ease: m.springLively },
+          { scale: 1.00, duration: 0.20, ease: m.smoothOut },
+        ],
+      }, at);
+    }
+
+    // ─── 3.10s — A fresh extension application drops in ("even while
+    //             you sleep") — glow flash + Applied 3 → 4 ──────────────
+    tl.to("#kb-incoming", { opacity: 1, y: 0, scale: 1, duration: m.ui, ease: m.springBrisk }, 3.10);
+    tl.fromTo("#kb-incoming",
+      { boxShadow: "0 0 0 2px rgba(83, 58, 253, 0.45), 0 8px 24px rgba(83, 58, 253, 0.25)" },
+      { boxShadow: "0 0 0 0px rgba(83, 58, 253, 0), 0 0px 0px rgba(83, 58, 253, 0)", duration: 0.90, ease: m.smoothOut },
+      3.20);
+    countTo("applied", 3, 4, 3.35);
+    tl.to("#kb-ext-badge", {
+      keyframes: [
+        { scale: 1.08, duration: 0.20, ease: m.springLively },
+        { scale: 1.00, duration: 0.26, ease: m.smoothOut },
+      ],
+    }, 3.30);
+
+    // ─── 4.30s — HERO: drag the Acme card Applied → Interviewing ───────
+    // GSAP leaves a transform on every .kb-col (column-rise tween), so each
+    // column is its own stacking context — the card's z-index alone can't
+    // beat the later-DOM Interviewing column. Raise the whole source column.
+    tl.set('.kb-col[data-col="applied"]', { zIndex: 5 }, 4.30);
+    tl.set("#kb-drag", { zIndex: 50 }, 4.30);
+    tl.to("#kb-drag", {
+      scale: 1.04, rotation: 2, boxShadow: "rgba(3, 3, 39, 0.25) 0px 14px 21px -14px, rgba(0, 0, 0, 0.10) 0px 8px 17px -8px",
+      duration: 0.25, ease: m.smoothOut, transformOrigin: "50% 50%",
+    }, 4.30);
+    tl.to("#kb-drag", { x: DRAG_DX, y: DRAG_DY, duration: 0.80, ease: m.smoothInOut }, 4.55);
+    // Drop-zone highlight while the card hovers Interviewing
+    tl.to("#kb-track-interviewing", {
+      borderColor: "#b9b9f9", backgroundColor: "rgba(83, 58, 253, 0.05)",
+      duration: 0.25, ease: m.smoothOut,
+    }, 4.80);
+    tl.to("#kb-drag", { scale: 1, rotation: 0, boxShadow: "0 0 0 rgba(0,0,0,0)", duration: 0.35, ease: m.springBrisk }, 5.35);
+    countTo("applied", 4, 3, 5.45);
+    countTo("interviewing", 2, 3, 5.45);
+    tl.to("#kb-track-interviewing", {
+      borderColor: "#e5edf5", backgroundColor: "#f6f9fc",
+      duration: 0.40, ease: m.smoothOut,
+    }, 5.60);
+    // Applied column closes the gap the card left behind
+    tl.to(".kb-shift", { y: SHIFT_UP, duration: 0.45, ease: m.smoothOut, stagger: 0.04 }, 5.60);
+
+    // ─── 6.40s — Settle: the moved card pulses once (it's the win) ──────
+    tl.to("#kb-drag", {
+      keyframes: [
+        { scale: 1.025, duration: 0.20, ease: m.springLively },
+        { scale: 1.000, duration: 0.26, ease: m.smoothOut },
+      ],
+    }, 6.40);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["job-applications"] = tl;
+  </script>
+</body>
+</html>

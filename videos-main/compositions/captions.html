@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <title>Resume AI — Captions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 1920px; height: 1080px; margin: 0; overflow: hidden; background: transparent; }
+    .cap-root {
+      pointer-events: none;
+      position: relative;
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+    }
+    #cap-container { position: absolute; inset: 0; }
+    .cap-group {
+      position: absolute;
+      bottom: 96px; left: 0; width: 100%;
+      display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center;
+      gap: 8px; padding: 0 100px;
+      opacity: 0; visibility: hidden;
+    }
+    .cap-word {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 800;
+      font-size: 60px;
+      text-transform: uppercase;
+      color: #ffffff;
+      display: inline-block;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      position: relative;
+      padding: 6px 12px 8px;
+      text-shadow: 0 2px 6px rgba(6, 27, 49, 0.55), 0 8px 22px rgba(6, 27, 49, 0.35);
+      transform-origin: 50% 58%;
+      will-change: transform, filter;
+    }
+    .cap-word-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #533afd 0%, #2e2b8c 100%);
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(83, 58, 253, 0.35);
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: 0% 50%;
+      z-index: -1;
+    }
+    .cap-word-text { position: relative; z-index: 1; }
+  </style>
+</head>
+<body>
+  <div class="cap-root"
+       data-layout-allow-overflow
+       data-composition-id="captions"
+       data-start="0"
+       data-duration="58.2"
+       data-width="1920"
+       data-height="1080">
+    <div id="cap-container"></div>
+  </div>
+
+  <script src="/assets/captions-data.js"></script>
+  <script>
+    (function () {
+      var WORDS = window.__captionWords || [];
+      var RAW_GROUPS = window.__captionGroups || [];
+
+      // Captions run only over the product scenes — the hook, brand,
+      // stats, and CTA beats already show their narration as on-screen
+      // typography, so captioning them would double the text.
+      var CAPTION_FROM = 5.6, CAPTION_TO = 47.7;
+      var GROUPS_IN_RANGE = RAW_GROUPS.filter(function (pair) {
+        var s = WORDS[pair[0]].start;
+        return s >= CAPTION_FROM && s < CAPTION_TO;
+      });
+
+      var _fitCanvas = document.createElement("canvas");
+      var _fitCtx = _fitCanvas.getContext("2d");
+      function fitFontSize(text, baseFontSize, maxWidth) {
+        var size = baseFontSize;
+        var minSize = Math.floor(baseFontSize * 0.45);
+        while (size > minSize) {
+          _fitCtx.font = "800 " + size + "px Montserrat";
+          if (_fitCtx.measureText(text).width <= maxWidth) return size;
+          size -= 2;
+        }
+        return minSize;
+      }
+
+      var GROUPS = GROUPS_IN_RANGE.map(function (pair, gi) {
+        var nextStart = gi + 1 < GROUPS_IN_RANGE.length
+          ? WORDS[GROUPS_IN_RANGE[gi + 1][0]].start
+          : Math.min(WORDS[pair[1]].end + 0.6, CAPTION_TO);
+        var gEnd = Math.min(WORDS[pair[1]].end + 0.5, nextStart - 0.05);
+        return { wordStart: pair[0], wordEnd: pair[1], start: WORDS[pair[0]].start, end: gEnd };
+      });
+
+      var container = document.getElementById("cap-container");
+      var tl = gsap.timeline({ paused: true });
+
+      GROUPS.forEach(function (g, gi) {
+        var groupWords = WORDS.slice(g.wordStart, g.wordEnd + 1);
+        var grp = document.createElement("div");
+        grp.className = "cap-group";
+        grp.id = "cap-grp-" + gi;
+
+        var groupText = groupWords.map(function (w) { return w.text.toUpperCase(); }).join(" ");
+        var computedSize = fitFontSize(groupText, 60, 1500);
+
+        groupWords.forEach(function (w, i) {
+          var wi = g.wordStart + i;
+          var wordEl = document.createElement("span");
+          wordEl.className = "cap-word";
+          wordEl.id = "cap-w-" + wi;
+          wordEl.style.fontSize = computedSize + "px";
+
+          var bgEl = document.createElement("span");
+          bgEl.className = "cap-word-bg";
+          bgEl.id = "cap-bg-" + wi;
+
+          var textEl = document.createElement("span");
+          textEl.className = "cap-word-text";
+          textEl.textContent = w.text.toUpperCase();
+
+          wordEl.appendChild(bgEl);
+          wordEl.appendChild(textEl);
+          grp.appendChild(wordEl);
+        });
+
+        container.appendChild(grp);
+
+        tl.set(grp, { visibility: "visible" }, g.start);
+        tl.fromTo(grp, { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.14, ease: "power2.out" }, g.start);
+
+        groupWords.forEach(function (w, i) {
+          var wi = g.wordStart + i;
+          var bgEl = document.getElementById("cap-bg-" + wi);
+          var wordEl = document.getElementById("cap-w-" + wi);
+
+          tl.to(bgEl, { opacity: 1, scaleX: 1, duration: 0.14, ease: "power2.out" }, w.start);
+          tl.to(wordEl, { scale: 1.06, duration: 0.09, ease: "power2.out" }, w.start);
+          tl.to(wordEl, { scale: 1.0, duration: 0.14, ease: "power2.out" }, w.start + 0.09);
+          tl.to(bgEl, { opacity: 0, scaleX: 1.02, duration: 0.1, ease: "power2.in" }, w.end);
+          tl.set(bgEl, { scaleX: 0 }, w.end + 0.1);
+        });
+
+        tl.to(grp, { opacity: 0, duration: 0.1, ease: "power2.in" }, g.end - 0.1);
+        tl.set(grp, { opacity: 0, visibility: "hidden" }, g.end);
+      });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["captions"] = tl;
+    })();
+  </script>
+</body>
+</html>
